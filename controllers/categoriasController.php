@@ -81,7 +81,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($data['filtroBusqueda'])) {
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-
+    // si llega a dar aviso o error, es un falso negativo ya que cambia aveces por el valor retornado
     $peticion = $categoriasModel->obtenerCategorias();
 
     if ($peticion) {
