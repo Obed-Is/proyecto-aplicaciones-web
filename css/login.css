@@ -1,0 +1,50 @@
+:root {
+    --fondo: #f4f4f4;
+    --card-fondo: rgba(255, 255, 255, 0.9);
+    --boton-verde: #4CAF50;
+    --hover-btn-verde: #45a049;
+    --icono-color: #6c757d;
+}
+
+body {
+    height: 100vh;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, #f1f1f1, #cfe8ff);
+}
+
+.card {
+    backdrop-filter: blur(10px);
+    background-color: var(--card-fondo);
+    border-radius: 1.5rem;
+    box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.1);
+}
+
+.btn-green {
+    background-color: var(--boton-verde);
+    border-color: var(--boton-verde);
+}
+
+.btn-green:hover {
+    background-color: var(--hover-btn-verde);
+    border-color: var(--hover-btn-verde);
+}
+
+.logo {
+    width: 60px;
+    height: 60px;
+}
+
+.form-control:focus {
+    box-shadow: 0 0 0 0.2rem rgba(76, 175, 80, 0.25);
+}
+
+.show-password {
+    cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: var(--icono-color);
+}

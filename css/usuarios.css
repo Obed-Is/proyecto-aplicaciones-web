@@ -1,0 +1,99 @@
+body {
+    background: linear-gradient(135deg, #f1f1f1, #cfe8ff);
+    min-height: 100dvh;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+
+.dashboard-title {
+    color: #386641;
+    font-weight: bold;
+}
+
+.container {
+    margin-top: 30px;
+}
+
+.search-container {
+    padding: 20px;
+    background-color: rgb(247, 255, 253) !important;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    border: 1px solid #e0f2e7;
+}
+
+.input-group-text {
+    cursor: pointer;
+}
+
+.buscar-input {
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    padding: 8px 12px;
+    margin-right: 15px;
+    flex-grow: 1;
+}
+
+.tabla-usuarios {
+    width: 100%;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.08);
+    overflow: hidden;
+    table-layout: fixed;
+}
+
+.filtro-opciones select {
+    margin: 0 10px 0 10px;
+    font-size: 0.9rem;
+    color: #6c757d;
+}
+
+.tabla-usuarios th {
+    background-color: #472e46;
+    color: rgb(255, 252, 252);
+}
+
+.tabla-usuarios td {
+    color: #30352f;
+}
+
+.status-activo {
+    color: #43a047;
+}
+
+.status-inactivo {
+    color: #d32f2f;
+}
+
+.iconos-acciones a {
+    transition: transform 0.2s;
+}
+
+.iconos-acciones a:hover {
+    transform: scale(1.2);
+    text-decoration: none;
+}
+
+.transicion-fila {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+
+.transicion-fila.mostrar {
+    opacity: 1;
+    transform: translateY(0);
+}
+
+.show-password {
+    cursor: pointer;
+    position: absolute;
+    right: 1rem;
+    top: 50%;
+    transform: translateY(-50%);
+    color: #6c757d;
+}

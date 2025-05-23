@@ -1,0 +1,83 @@
+body {
+    background: linear-gradient(135deg, #f1f1f1, #cfe8ff);
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.panel-title {
+    color: #367d5e;
+    font-weight: 600;
+    margin-bottom: 2.5rem;
+}
+
+.category-card {
+    border-radius: 15px;
+    border: none;
+    background-color: #fff;
+}
+
+.search-bar .form-control {
+    border-top-right-radius: 10px !important;
+    border-bottom-right-radius: 10px !important;
+    border-left: none;
+}
+
+.btn-agregar-categoria {
+    background-color: #4CAF50;
+    border-color: #4CAF50;
+    border-radius: 8px;
+    padding: 10px 25px;
+    font-size: 1.05rem;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+    transition: background-color 0.3s ease, transform 0.2s ease;
+}
+
+.btn-agregar-categoria:hover {
+    background-color: #45a049;
+    border-color: #45a049;
+    transform: translateY(-2px);
+}
+
+ .transicion-fila {
+  opacity: 0;
+  transform: translateY(20px);
+  transition: opacity 0.3s ease-out, transform 0.3s ease-out;
+}
+.transicion-fila.mostrar {
+  opacity: 1;
+  transform: translateY(0);
+}
+#categoriaDescripcion, #categoriaDescripcionModificar{
+    resize: none;
+}
+
+
+.table th {
+    background-color: #f8f9fa;
+    color: #343a40;
+    font-weight: 600;
+}
+
+.table tbody tr {
+    transition: background-color 0.2s ease;
+}
+
+.table tbody tr:hover {
+    background-color: #f0f8ff;
+}
+
+
+.action-buttons .btn-info {
+    background-color: #17a2b8;
+    border-color: #17a2b8;
+}
+
+.action-buttons .btn-danger {
+    background-color: #dc3545;
+    border-color: #dc3545;
+}
+
+@media (max-width: 990px) {
+  .btn {
+    margin: 3px 0 0 0;
+  }
+}
