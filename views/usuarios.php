@@ -65,12 +65,12 @@ $errores = $_SESSION['errores']['nuevoUsuario'] ?? [];
         <table class="table tabla-usuarios">
             <thead>
                 <tr>
-                    <th>Nombre</th>
-                    <th>Correo electronico</th>
-                    <th>Usuario</th>
-                    <th>Rol</th>
-                    <th>Estado</th>
-                    <th>Fecha de Creacion</th>
+                    <th class="responsiv-tabla">Nombre</th>
+                    <th class="responsiv-tabla">Correo electronico</th>
+                    <th class="responsiv-tabla">Usuario</th>
+                    <th class="responsiv-tabla">Rol</th>
+                    <th class="responsiv-tabla">Estado</th>
+                    <th class="responsiv-tabla">Fecha de Creacion</th>
                     <th>Acciones</th>
                 </tr>
             </thead>

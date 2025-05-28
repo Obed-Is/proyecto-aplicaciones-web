@@ -28,62 +28,77 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     exit();
 }
 # AQUI SE VALIDA NUEVAMENTE Y SE HACE LA PETICION PARA AGREGAR UN NUEVO USUARIO
-if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['nombre'])) {
-    $nombre = trim($_POST['nombre']);
-    $apellido = trim($_POST['apellido']);
-    $correo = trim($_POST['correo']);
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['usuario_nombre'])) {
+    $nombre = trim($_POST['usuario_nombre']);
+    $apellido = trim($_POST['usuario_apellido']);
+    $dui = trim($_POST['dui']);
+    $correo = trim($_POST['correo_electronico']);
+    $direccion = trim($_POST['direccion']);
+    $municipio = trim($_POST['municipio']);
     $nombreUsuario = trim($_POST['nombreUsuario']);
     $contraseña = trim($_POST['contraseña']);
-    $permiso = $_POST['permiso'] ?? '';
+    $contrato = trim($_POST['contrato']);
+    $fechaNacimiento = $_POST['fecha_nacimiento'] ?? '';
+    $salario = trim($_POST['salario']);
+    $telefono = trim($_POST['telefono']);
+    $permiso = $_POST['nombre_rol'] ?? '';
+    $estado = $_POST['estado'] ?? 1;
 
-    if (empty($nombre) || empty($nombre) || empty($apellido) || empty($nombreUsuario) || empty($contraseña) || empty($permiso)) {
-        echo json_encode(['success' => false, 'message' => 'Datos no validos']);
+    if (
+        empty($nombre) || empty($apellido) || empty($dui) || empty($correo) || empty($direccion) ||
+        empty($municipio) || empty($nombreUsuario) || empty($contraseña) || empty($fechaNacimiento) ||
+        empty($salario) || empty($telefono) || empty($permiso)
+    ) {
+        echo json_encode(['success' => false, 'message' => 'Datos no válidos']);
         exit();
     }
 
-    if (strlen($nombre) < 3 || strlen($nombre) > 35) {
-        echo json_encode(['success' => false, 'message' => 'Datos no validos']);
+    $insercionUsuario = $userModel->agregarUsuario(
+        $nombre,
+        $correo,
+        $apellido,
+        $nombreUsuario,
+        $contraseña,
+        $contrato,
+        $permiso,
+        $dui,
+        $direccion,
+        $municipio,
+        $fechaNacimiento,
+        $salario,
+        $telefono,
+        $estado
+    );
+
+    if ($insercionUsuario === 'dui duplicado') {
+        echo json_encode(['success' => false, 'message' => 'El DUI ya esta registrado']);
         exit();
     }
 
-    if (strlen($apellido) < 3 || strlen($apellido) > 35) {
-        echo json_encode(['success' => false, 'message' => 'Datos no validos']);
+    if ($insercionUsuario === 'telefono duplicado') {
+        echo json_encode(['success' => false, 'message' => 'El teléfono ya esta registrado']);
         exit();
     }
-
-    if (strlen($correo) < 6 || strlen($correo) > 255) {
-        echo json_encode(['success' => false, 'message' => 'Datos no validos']);
-        exit();
-    }
-
-    if (strlen($nombreUsuario) < 4 || strlen($nombreUsuario) > 15) {
-        echo json_encode(['success' => false, 'message' => 'Datos no validos']);
-        exit();
-    }
-
-    if (strlen($contraseña) < 4 || strlen($contraseña) > 8) {
-        echo json_encode(['success' => false, 'message' => 'Datos no validos']);
-        exit();
-    }
-
-    $insercionUsuario = $userModel->agregarUsuario($nombre,$correo, $apellido, $nombreUsuario, $contraseña, $permiso);
 
     if ($insercionUsuario === 'rol invalido') {
         echo json_encode(['success' => false, 'message' => 'No se pudo encontrar el permiso o es invalido']);
         exit();
-    } elseif ($insercionUsuario === 1) {
+    }
+    if ($insercionUsuario === 1) {
         echo json_encode(['success' => false, 'message' => 'El nombre de usuario ya existe, ingrese un valor único']);
         exit();
-    } elseif ($insercionUsuario === 2) {
+    }
+    if ($insercionUsuario === 2) {
         echo json_encode(['success' => false, 'message' => 'El correo electronico ya existe, ingrese un valor único']);
         exit();
-    } elseif ($insercionUsuario) {
+    }
+    if ($insercionUsuario === true) {
         echo json_encode(['success' => true, 'message' => 'Usuario creado correctamente']);
         exit();
-    } else {
-        echo json_encode(['success' => false, 'message' => 'Ocurrio un error al intentar agregar el usuario']);
-        exit();
     }
+
+    echo json_encode(['success' => false, 'message' => 'Ocurrio un error al intentar agregar el usuario']);
+    exit();
 }
 # ESTO ES PARA ELIMINAR UN USUARIO
 if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
@@ -110,7 +125,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         exit();
     }
 
-    $camposModificables = ['usuario_nombre', 'usuario_apellido', 'correo_electronico', 'nombreUsuario', 'contraseña', 'nombre_rol', 'estado'];
+    $camposModificables = [
+        'usuario_nombre',
+        'usuario_apellido',
+        'dui',
+        'correo_electronico',
+        'direccion',
+        'nombreUsuario',
+        'contraseña',
+        'tipo_contrato',
+        'fecha_nacimiento',
+        'salario',
+        'telefono',
+        'nombre_rol',
+        'estado'
+    ];
+
     $camposPresentes = array_intersect_key($usuarioData, array_flip($camposModificables));
 
     if (count($camposPresentes) === 0) {
@@ -138,7 +168,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
             exit();
         }
     }
-    
+
     if (isset($usuarioData['nombreUsuario'])) {
         if (strlen($usuarioData['nombreUsuario']) < 4 || strlen($usuarioData['nombreUsuario']) > 15) {
             echo json_encode(['success' => "error", 'message' => 'El nombre de usuario debe tener entre 4 y 15 caracteres']);
@@ -163,28 +193,41 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
     $peti = $userModel->actualizarUsuario($usuarioData);
 
 
-    if ($peti == "idenficador") {
+    if ($peti === "idenficador") {
         echo json_encode(['success' => "error", 'message' => 'No se encontro el identificador del usuario']);
         exit();
-    } elseif ($peti == 'rol invalido') {
+    }
+    if ($peti === 'rol invalido') {
         echo json_encode(['success' => "error", 'message' => 'No se pudo encontrar el permiso o es invalido']);
         exit();
-    } elseif ($peti == "duplicado") {
+    }
+    if ($peti === "duplicado") {
         echo json_encode(['success' => "warning", 'message' => 'El nombre de usuario ya existe, ingrese un valor unico']);
         exit();
-    } elseif ($peti == "duplicado_correo") {
+    }
+    if ($peti === "duplicado_correo") {
         echo json_encode(['success' => "warning", 'message' => 'El correo electronico ya existe, ingrese un valor unico']);
         exit();
-    } elseif ($peti == "exito") {
-        echo json_encode(["success" => "success", "message" => "El usuario ha sido actualizado correctamente"]);
-        exit();
-    } elseif ($peti == "fallo") {
-        echo json_encode(["success" => "error", "message" => "Ocurrio un error al intentar actualizar el usuario"]);
-        exit();
-    } else {
-        echo json_encode(["success" => "error", "message" => "No se pudo actualizar el usuario, error al consultar"]);
+    }
+    if ($peti === "duplicado_dui") {
+        echo json_encode(['success' => "warning", 'message' => 'El DUI ya existe, ingrese un valor unico']);
         exit();
     }
+    if ($peti === "duplicado_telefono") {
+        echo json_encode(['success' => "warning", 'message' => 'El telefono ya existe, ingrese un valor unico']);
+        exit();
+    }
+    if ($peti === "exito") {
+        echo json_encode(["success" => "success", "message" => "El usuario ha sido actualizado correctamente"]);
+        exit();
+    }
+    if ($peti === "fallo") {
+        echo json_encode(["success" => "error", "message" => "Ocurrio un error al intentar actualizar el usuario"]);
+        exit();
+    }
+
+    echo json_encode(["success" => "error", "message" => "No se pudo actualizar el usuario, error al consultar"]);
+    exit();
 
 }
 
