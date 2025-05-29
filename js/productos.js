@@ -267,11 +267,11 @@ document.getElementById('formAgregarProducto').addEventListener('submit', async 
     });
     const data = await res.json();
     if (data.success) {
-        Swal.fire('Éxito', 'Producto agregado correctamente', 'success');
+        alertaEsquinaSuperior('success', data.message);
         form.reset();
         await mostrarProductos();
     } else {
-        Swal.fire('Error', data.message || 'No se pudo agregar el producto', 'error');
+        alertaEsquinaSuperior('error', data.message || 'No se pudo agregar el producto');
     }
 });
 

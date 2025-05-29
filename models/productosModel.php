@@ -101,16 +101,16 @@ class ProductosModel {
         return $stmt->execute();
     }
 
-    public function buscarProducto($nombre_producto)
+    public function buscarProducto($filtro)
 {
     $query = "SELECT p.id, p.codigo, p.nombre, p.descripcion, p.precio, p.stock, p.estado, p.idCategoria, p.stock_minimo, 
-                         p.idProveedor, pr.nombre as proveedor_nombre, c.nombre as nombre_categoria
-                  FROM productos p
-                  LEFT JOIN proveedores pr ON p.idProveedor = pr.id
-                  LEFT JOIN categorias c ON p.idCategoria = c.id
-                  WHERE p.estado = 1 AND p.nombre LIKE ?";
+                     p.idProveedor, pr.nombre as proveedor_nombre, c.nombre as nombre_categoria
+              FROM productos p
+              LEFT JOIN proveedores pr ON p.idProveedor = pr.id
+              LEFT JOIN categorias c ON p.idCategoria = c.id
+              WHERE p.estado = 1 AND (p.nombre LIKE ? OR p.codigo LIKE ?)";
     $stmt = $this->db->getConnection()->prepare($query);
-    $stmt->bind_param('s', $nombre_producto);
+    $stmt->bind_param('ss', $filtro, $filtro);
     $stmt->execute();
     $result = $stmt->get_result();
 
@@ -121,6 +121,23 @@ class ProductosModel {
 
     return $productos;
 }
+
+    public function codigoExiste($codigo, $excluirId = null) {
+        $query = "SELECT COUNT(*) as total FROM productos WHERE codigo = ?";
+        if ($excluirId) {
+            $query .= " AND id != ?";
+        }
+        $stmt = $this->db->getConnection()->prepare($query);
+        if ($excluirId) {
+            $stmt->bind_param('si', $codigo, $excluirId);
+        } else {
+            $stmt->bind_param('s', $codigo);
+        }
+        $stmt->execute();
+        $stmt->bind_result($total);
+        $stmt->fetch();
+        return $total > 0;
+    }
 
 }
 
