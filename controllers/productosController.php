@@ -173,8 +173,10 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         header('Content-Type: application/json');
         if ($ok) {
             echo json_encode(['success' => true, 'message' => 'Producto eliminado correctamente.']);
+            header("Location: ../views/productos.php?mensaje=eliminado");
         } else {
             echo json_encode(['success' => false, 'message' => 'Error al eliminar el producto.']);
+            header("Location: ../views/productos.php?mensaje=no se pudo eliminar");
         }
         exit();
     }
