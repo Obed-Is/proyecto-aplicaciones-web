@@ -43,7 +43,7 @@ class ProductosModel {
                          pr.nombre as proveedor_nombre, c.nombre as nombre_categoria
                   FROM productos p
                   LEFT JOIN proveedores pr ON p.idProveedor = pr.id
-                  LEFT JOIN categorias c ON p.idCategoria = c.id";
+                  LEFT JOIN categorias c ON p.idCategoria = c.id WHERE p.estado != -1";
         $stmt = $this->db->getConnection()->prepare($query);
         $stmt->execute();
         $result = $stmt->get_result();
@@ -95,7 +95,7 @@ class ProductosModel {
 
     //eliminar producto
     public function eliminarProducto($id) {
-        $query = "DELETE FROM productos WHERE id=?";
+        $query = "UPDATE productos SET estado = -1 WHERE id=?";
         $stmt = $this->db->getConnection()->prepare($query);
         $stmt->bind_param("i", $id);
         return $stmt->execute();

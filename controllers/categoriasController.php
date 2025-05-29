@@ -84,12 +84,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // si llega a dar aviso o error, es un falso negativo ya que cambia aveces por el valor retornado
     $peticion = $categoriasModel->obtenerCategorias();
 
-    if ($peticion) {
-        echo json_encode($peticion);
-        exit();
-    }
-
-    echo json_encode(['success' => false, 'message' => 'Ocurrio un error al encontrar la categoria']);
+    echo json_encode($peticion);
     exit();
 }
 
@@ -103,9 +98,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'DELETE') {
     $peticion = $categoriasModel->eliminarCategoria($data['idCategoria']);
 
     if ($peticion === 'Productos en categoria') {
-        echo json_encode(['success' => "warning", 
-        'message' => 'No se pudo eliminar la categoria, existen productos asignados a esta categoria, se recomienda mover los productos a una categoria diferente y luego eliminar la categoria',
-        'titulo' => "No se puede eliminar"]);
+        echo json_encode([
+            'success' => "warning",
+            'message' => 'No se pudo eliminar la categoria, existen productos asignados a esta categoria, se recomienda mover los productos a una categoria diferente y luego eliminar la categoria',
+            'titulo' => "No se puede eliminar"
+        ]);
         exit();
     }
 

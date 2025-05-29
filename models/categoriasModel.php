@@ -105,7 +105,7 @@ class categoriasModel
     public function eliminarCategoria($idCategoria)
     {
 
-        $query = "SELECT COUNT(*) AS total FROM productos WHERE idCategoria = ?";
+        $query = "SELECT COUNT(*) AS total FROM productos WHERE idCategoria = ? AND estado != -1";
 
         $stmt = $this->db->getConnection()->prepare($query);
         $stmt->bind_param('i', $idCategoria);
@@ -116,7 +116,7 @@ class categoriasModel
             return 'Productos en categoria';
         }
 
-        $consulta = "DELETE FROM categorias WHERE id = ?";
+        $consulta = "UPDATE categorias SET estado = -1 WHERE id = ?";
 
         $stmt = $this->db->getConnection()->prepare($consulta);
         $stmt->bind_param('i', $idCategoria);
