@@ -63,6 +63,14 @@ if (!isset($_SESSION['usuario'])) {
         </a>
       </div>
 
+      <!-- Enlace a Proveedores -->
+      <div class="col">
+        <a href="proveedores.php" class="glass-card w-100 text-dark text-decoration-none d-block">
+          <i class="bi bi-box-seam glass-icon"></i>
+          <h5>Proveedores</h5>
+        </a>
+      </div>
+
       <!-- Enlace a Crear Venta -->
       <div class="col">
         <a href="ventas.php" class="glass-card w-100 text-dark text-decoration-none d-block">
