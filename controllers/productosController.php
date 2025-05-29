@@ -4,29 +4,30 @@ require_once '../models/productosModel.php';
 
 $productosModel = new ProductosModel();
 
-// --- Lógica de búsqueda: debe ir antes del manejo general de POST ---
+// POST: búsqueda, edición o agregado
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-    // Soporta tanto application/json como x-www-form-urlencoded
     $contentType = $_SERVER["CONTENT_TYPE"] ?? '';
+    // Si es búsqueda (JSON con filtro)
     if (stripos($contentType, 'application/json') !== false) {
         $input = json_decode(file_get_contents('php://input'), true);
         $filtro = trim($input['filtroBusqueda'] ?? '');
-    } else {
-        $filtro = trim($_POST['filtroBusqueda'] ?? '');
+        if (!empty($filtro)) {
+            $nombre_producto = $filtro . "%";
+            $peticion = $productosModel->buscarProducto($nombre_producto);
+            header('Content-Type: application/json');
+            echo json_encode($peticion);
+            exit();
+        }
     }
-    if (!empty($filtro)) {
-        $nombre_producto = $filtro . "%"; // <-- Agrega los comodines aquí
-        $peticion = $productosModel->buscarProducto($nombre_producto);
-        echo json_encode($peticion);
-        exit();
-    }
-}
 
-if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Si no es búsqueda, es edición o agregado (formulario)
     $action = $_POST['action'] ?? '';
+    $isAjax = (isset($_SERVER['HTTP_X_REQUESTED_WITH']) && strtolower($_SERVER['HTTP_X_REQUESTED_WITH']) === 'xmlhttprequest')
+        || (isset($_SERVER["CONTENT_TYPE"]) && stripos($_SERVER["CONTENT_TYPE"], 'application/json') !== false);
+
+    header('Content-Type: application/json');
     try {
         if ($action === 'edit' && isset($_POST['id'])) {
-            // Edición de producto
             $id = intval($_POST['id']);
             $codigo = $_POST['codigo'];
             $nombre = $_POST['nombre'];
@@ -37,20 +38,54 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $idCategoria = intval($_POST['idCategoria']);
             $stock_minimo = intval($_POST['stock_minimo']);
             $imagen = (isset($_FILES['imagen']) && $_FILES['imagen']['size'] > 0) ? $_FILES['imagen'] : null;
+            $idProveedor = intval($_POST['idProveedor']);
 
+            // Validaciones
+            if (!$codigo || strlen($codigo) > 4) {
+                echo json_encode(['success' => false, 'message' => 'Código requerido y máximo 4 caracteres.']);
+                exit();
+            }
+            if (!$nombre || strlen($nombre) < 3 || strlen($nombre) > 40) {
+                echo json_encode(['success' => false, 'message' => 'Nombre requerido (3-40 caracteres).']);
+                exit();
+            }
+            if (!$descripcion || strlen($descripcion) < 5 || strlen($descripcion) > 100) {
+                echo json_encode(['success' => false, 'message' => 'Descripción requerida (5-100 caracteres).']);
+                exit();
+            }
+            if ($precio < 0) {
+                echo json_encode(['success' => false, 'message' => 'Precio inválido.']);
+                exit();
+            }
+            if ($stock < 0) {
+                echo json_encode(['success' => false, 'message' => 'Stock inválido.']);
+                exit();
+            }
+            if ($stock_minimo < 0) {
+                echo json_encode(['success' => false, 'message' => 'Stock mínimo inválido.']);
+                exit();
+            }
+            if ($estado != 0 && $estado != 1) {
+                echo json_encode(['success' => false, 'message' => 'Estado inválido.']);
+                exit();
+            }
             if (empty($idCategoria) || $idCategoria <= 0) {
-                echo "<script>alert('Error: Debe seleccionar una categoría válida.'); window.location='../views/productos.php';</script>";
+                echo json_encode(['success' => false, 'message' => 'Debe seleccionar una categoría válida.']);
+                exit();
+            }
+            if (empty($idProveedor) || $idProveedor <= 0) {
+                echo json_encode(['success' => false, 'message' => 'Debe seleccionar un proveedor válido.']);
                 exit();
             }
 
-            if ($productosModel->editarProducto($id, $codigo, $nombre, $descripcion, $precio, $stock, $estado, $idCategoria, $stock_minimo, $imagen)) {
-                echo "<script>alert('Producto editado con éxito.'); window.location='../views/productos.php';</script>";
+            $ok = $productosModel->editarProducto($id, $codigo, $nombre, $descripcion, $precio, $stock, $estado, $idCategoria, $stock_minimo, $imagen, $idProveedor);
+            if ($ok) {
+                echo json_encode(['success' => true, 'message' => 'Producto editado con éxito.']);
             } else {
-                echo "<script>alert('Error al editar el producto.'); window.location='../views/productos.php';</script>";
+                echo json_encode(['success' => false, 'message' => 'Error al editar el producto.']);
             }
             exit();
         } else {
-            // Agregar producto
             $codigo = $_POST['codigo'];
             $nombre = $_POST['nombre'];
             $descripcion = $_POST['descripcion'];
@@ -60,27 +95,62 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $idCategoria = intval($_POST['idCategoria']);
             $stock_minimo = intval($_POST['stock_minimo']);
             $imagen = $_FILES['imagen'];
+            $idProveedor = intval($_POST['idProveedor']);
 
+            // Validaciones
+            if (!$codigo || strlen($codigo) > 4) {
+                echo json_encode(['success' => false, 'message' => 'Código requerido y máximo 4 caracteres.']);
+                exit();
+            }
+            if (!$nombre || strlen($nombre) < 3 || strlen($nombre) > 40) {
+                echo json_encode(['success' => false, 'message' => 'Nombre requerido (3-40 caracteres).']);
+                exit();
+            }
+            if (!$descripcion || strlen($descripcion) < 5 || strlen($descripcion) > 100) {
+                echo json_encode(['success' => false, 'message' => 'Descripción requerida (5-100 caracteres).']);
+                exit();
+            }
+            if ($precio < 0) {
+                echo json_encode(['success' => false, 'message' => 'Precio inválido.']);
+                exit();
+            }
+            if ($stock < 0) { // Limite razonable para stock
+                echo json_encode(['success' => false, 'message' => 'Stock inválido.']);
+                exit();
+            }
+            if ($stock_minimo < 0 || $stock_minimo > $stock) {
+                echo json_encode(['success' => false, 'message' => 'Stock mínimo inválido.']);
+                exit();
+            }
+            if ($estado != 0 && $estado != 1) {
+                echo json_encode(['success' => false, 'message' => 'Estado inválido.']);
+                exit();
+            }
             if (empty($idCategoria) || $idCategoria <= 0) {
-                echo "<script>alert('Error: Debe seleccionar una categoría válida.'); window.location='../views/productos.php';</script>";
+                echo json_encode(['success' => false, 'message' => 'Debe seleccionar una categoría válida.']);
+                exit();
+            }
+            if (empty($idProveedor) || $idProveedor <= 0) {
+                echo json_encode(['success' => false, 'message' => 'Debe seleccionar un proveedor válido.']);
                 exit();
             }
 
-            if ($productosModel->agregarProducto($codigo, $nombre, $descripcion, $precio, $stock, $estado, $idCategoria, $stock_minimo, $imagen)) {
-                echo "<script>alert('Producto agregado con éxito.'); window.location='../views/productos.php';</script>";
+            $ok = $productosModel->agregarProducto($codigo, $nombre, $descripcion, $precio, $stock, $estado, $idCategoria, $stock_minimo, $imagen, $idProveedor);
+            if ($ok) {
+                echo json_encode(['success' => true, 'message' => 'Producto agregado con éxito.']);
             } else {
-                echo "<script>alert('Error al agregar el producto.'); window.location='../views/productos.php';</script>";
+                echo json_encode(['success' => false, 'message' => 'Error al agregar el producto.']);
             }
             exit();
         }
     } catch (Exception $e) {
-        echo "<script>alert('Error: " . addslashes($e->getMessage()) . "'); window.location='../views/productos.php';</script>";
+        echo json_encode(['success' => false, 'message' => $e->getMessage()]);
         exit();
     }
 }
 
+// GET: obtener productos, imagen o eliminar
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
-    // Soporte para obtener solo la imagen de un producto (AJAX)
     if (isset($_GET['getImage']) && $_GET['getImage'] == 1 && isset($_GET['id'])) {
         $producto = $productosModel->obtenerProductoPorId($_GET['id']);
         if ($producto && !empty($producto['imagen'])) {
@@ -97,16 +167,37 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
         exit();
     }
-    // Soporte para eliminar producto
+    // Eliminar producto
     if (isset($_GET['action']) && $_GET['action'] === 'delete' && isset($_GET['id'])) {
-        $productosModel->eliminarProducto($_GET['id']);
-        header('Location: ../views/productos.php');
+        $ok = $productosModel->eliminarProducto($_GET['id']);
+        header('Content-Type: application/json');
+        if ($ok) {
+            echo json_encode(['success' => true, 'message' => 'Producto eliminado correctamente.']);
+        } else {
+            echo json_encode(['success' => false, 'message' => 'Error al eliminar el producto.']);
+        }
         exit();
     }
     $productos = $productosModel->obtenerProductos();
+    $productos_normalizados = [];
+    foreach ($productos as $p) {
+        $productos_normalizados[] = [
+            'id' => $p['id'],
+            'codigo' => $p['codigo'],
+            'nombre' => $p['nombre'],
+            'descripcion' => $p['descripcion'],
+            'precio' => $p['precio'],
+            'stock' => $p['stock'],
+            'estado' => $p['estado'],
+            'idCategoria' => $p['idCategoria'],
+            'nombre_categoria' => $p['nombre_categoria'],
+            'idProveedor' => $p['idProveedor'],
+            'proveedor_nombre' => $p['proveedor_nombre'],
+            'stock_minimo' => $p['stock_minimo']
+        ];
+    }
     header('Content-Type: application/json');
-    echo json_encode($productos);
+    echo json_encode($productos_normalizados);
     exit();
 }
-
 ?>

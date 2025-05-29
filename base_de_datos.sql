@@ -111,11 +111,14 @@ CREATE TABLE `productos` (
   `stock` int DEFAULT NULL,
   `estado` tinyint(1) DEFAULT '1',
   `idCategoria` int DEFAULT NULL,
+  `idProveedor` int DEFAULT NULL,
   `imagen` longblob,
   `stock_minimo` int NOT NULL,
   PRIMARY KEY (`id`),
   KEY `idCategoria` (`idCategoria`),
-  CONSTRAINT `productos_ibfk_1` FOREIGN KEY (`idCategoria`) REFERENCES `categorias` (`id`)
+  KEY `idProveedor` (`idProveedor`),
+  CONSTRAINT `productos_ibfk_1` FOREIGN KEY (`idCategoria`) REFERENCES `categorias` (`id`),
+  CONSTRAINT `productos_ibfk_2` FOREIGN KEY (`idProveedor`) REFERENCES `proveedores` (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=2 DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 /*!40101 SET character_set_client = @saved_cs_client */;
 
@@ -125,8 +128,24 @@ CREATE TABLE `productos` (
 
 LOCK TABLES `productos` WRITE;
 /*!40000 ALTER TABLE `productos` DISABLE KEYS */;
+INSERT INTO `productos` (`codigo`, `nombre`, `descripcion`, `precio`, `stock`, `estado`, `idCategoria`, `idProveedor`, `imagen`, `stock_minimo`)
+VALUES ('A001', 'Producto Demo', 'Descripción de prueba', 10.50, 100, 1, 11, 1, NULL, 10);
 /*!40000 ALTER TABLE `productos` ENABLE KEYS */;
 UNLOCK TABLES;
+
+--
+-- Table structure for table `proveedores`
+--
+
+DROP TABLE IF EXISTS `proveedores`;
+CREATE TABLE `proveedores` (
+  `id` int NOT NULL AUTO_INCREMENT,
+  `nombre` varchar(100) NOT NULL,
+  `telefono` varchar(20) NOT NULL,
+  `correo` varchar(100) NOT NULL,
+  `direccion` varchar(255) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_general_ci;
 
 --
 -- Table structure for table `roles`

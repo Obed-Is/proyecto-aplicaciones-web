@@ -1,3 +1,11 @@
+<?php
+session_start();
+
+if (!isset($_SESSION['usuario'])) {
+    header('Location: login.php');
+    exit();
+}
+?>
 <!DOCTYPE html>
 <html lang="es">
 <head>
@@ -20,23 +28,8 @@
 
     <div class="container py-5 mt-5">
         <h2 class="text-center dashboard-title mb-4 px-2">Gestión de Productos</h2>
-        
-        <?php
-        require_once '../models/db.php';
-        require_once '../models/productosModel.php';
-        require_once '../models/categoriasModel.php';
-        $productosModel = new ProductosModel();
-        $categoriasModel = new categoriasModel();
-        $productos = $productosModel->obtenerProductos();
-        $categorias = $categoriasModel->obtenerCategorias();
-        // Crear array asociativo para mapear id_categoria => nombre_categoria
-        $categoriasPorId = [];
-        foreach ($categorias as $cat) {
-            $categoriasPorId[$cat['id_categoria']] = $cat['nombre_categoria'];
-        }
-        ?>
         <div class="card p-4 shadow-sm mb-4">
-            <form action="../controllers/productosController.php" method="POST" enctype="multipart/form-data" class="row g-3">
+            <form id="formAgregarProducto" enctype="multipart/form-data" class="row g-3">
                 <div class="col-md-2">
                     <label for="codigo" class="form-label">Código:</label>
                     <input type="text" id="codigo" name="codigo" maxlength="4" required class="form-control">
@@ -72,11 +65,16 @@
                     <label for="idCategoria" class="form-label">Categoría:</label>
                     <select id="idCategoria" name="idCategoria" required class="form-select">
                         <option value="">Seleccione una categoría</option>
-                        <?php foreach ($categorias as $cat): ?>
-                            <option value="<?= htmlspecialchars($cat['id_categoria']) ?>">
-                                <?= htmlspecialchars($cat['nombre_categoria']) ?>
-                            </option>
-                        <?php endforeach; ?>
+                        <option value="" disabled>Cargando...</option>
+                        <!-- Opciones dinamicas -->
+                    </select>
+                </div>
+                <div class="col-md-2">
+                    <label for="idProveedor" class="form-label">Proveedor:</label>
+                    <select id="idProveedor" name="idProveedor" required class="form-select">
+                        <option value="">Seleccione un proveedor</option>
+                        <option value="" disabled>Cargando...</option>
+                        <!-- Opciones dinamicas -->
                     </select>
                 </div>
                 <div class="col-md-2">
@@ -99,13 +97,11 @@
                 <button id="btnBuscarProducto" class="btn btn-light ms-2">Buscar</button>
             </div>
         </div>
-        <!-- Fin buscador -->
         <div class="card shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>ID</th>
                             <th>Código</th>
                             <th>Nombre</th>
                             <th>Descripción</th>
@@ -113,47 +109,14 @@
                             <th>Stock</th>
                             <th>Estado</th>
                             <th>Categoría</th>
+                            <th>Proveedor</th>
                             <th>Stock Mínimo</th>
                             <th>Imagen</th>
                             <th>Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tablaProductos">
-                        <!-- Las filas se llenarán dinámicamente si se usa JS -->
-                        <?php
-                        foreach ($productos as $producto) {
-                            echo "<tr>";
-                            echo "<td>" . htmlspecialchars($producto['id']) . "</td>";
-                            echo "<td>" . htmlspecialchars($producto['codigo']) . "</td>";
-                            echo "<td>" . htmlspecialchars($producto['nombre']) . "</td>";
-                            echo "<td>" . htmlspecialchars($producto['descripcion']) . "</td>";
-                            echo "<td>" . htmlspecialchars($producto['precio']) . "</td>";
-                            echo "<td>" . htmlspecialchars($producto['stock']) . "</td>";
-                            echo "<td>" . (isset($producto['estado']) ? ($producto['estado'] ? 'Activo' : 'Inactivo') : '') . "</td>";
-                            // Mostrar el nombre de la categoría en vez del ID
-                            $nombreCategoria = isset($categoriasPorId[$producto['idCategoria']]) ? $categoriasPorId[$producto['idCategoria']] : '';
-                            echo "<td>" . htmlspecialchars($nombreCategoria) . "</td>";
-                            echo "<td>" . htmlspecialchars($producto['stock_minimo']) . "</td>";
-                            echo '<td class="td-imagen" data-id="' . htmlspecialchars($producto['id']) . '">';
-                            echo '<img src="../img/imgFaltante.png" alt="Cargando..." width="60" height="60" class="img-sustituta rounded" />';
-                            echo '</td>';
-                            echo "<td>";
-                            echo '<a href="#" class="btn btn-sm btn-primary editar-btn"
-                                data-id="' . htmlspecialchars($producto['id']) . '"
-                                data-codigo="' . htmlspecialchars($producto['codigo']) . '"
-                                data-nombre="' . htmlspecialchars($producto['nombre']) . '"
-                                data-descripcion="' . htmlspecialchars($producto['descripcion']) . '"
-                                data-precio="' . htmlspecialchars($producto['precio']) . '"
-                                data-stock="' . htmlspecialchars($producto['stock']) . '"
-                                data-estado="' . (isset($producto['estado']) ? $producto['estado'] : '') . '"
-                                data-idcategoria="' . htmlspecialchars($producto['idCategoria']) . '"
-                                data-stock_minimo="' . htmlspecialchars($producto['stock_minimo']) . '"
-                            ><i class="bi bi-pencil-square"></i></a> ';
-                            echo '<a href="../controllers/productosController.php?action=delete&id=' . $producto['id'] . '" class="btn btn-sm btn-danger" onclick="return confirm(\'¿Seguro que deseas eliminar este producto?\')"><i class="bi bi-trash"></i></a>';
-                            echo "</td>";
-                            echo "</tr>";
-                        }
-                        ?>
+                        <!-- se agregan dinamicamente -->
                     </tbody>
                 </table>
                 <div id="mensajeSinProductos" class="w-50 mx-auto text-center bg-light p-2 rounded" style="display: none;">
@@ -172,7 +135,7 @@
                     <button type="button" class="btn-close" id="cerrarModal"></button>
                 </div>
                 <div class="modal-body">
-                    <form id="formEditarProducto" enctype="multipart/form-data" method="POST" action="../controllers/productosController.php" class="row g-3">
+                    <form id="formEditarProducto" enctype="multipart/form-data" class="row g-3">
                         <input type="hidden" id="edit-id" name="id">
                         <input type="hidden" name="action" value="edit">
                         <div class="col-md-4">
@@ -210,11 +173,16 @@
                             <label for="edit-idCategoria" class="form-label">Categoría:</label>
                             <select id="edit-idCategoria" name="idCategoria" required class="form-select">
                                 <option value="">Seleccione una categoría</option>
-                                <?php foreach ($categorias as $cat): ?>
-                                    <option value="<?= htmlspecialchars($cat['id_categoria']) ?>">
-                                        <?= htmlspecialchars($cat['nombre_categoria']) ?>
-                                    </option>
-                                <?php endforeach; ?>
+                                <option value="" disabled>Cargando...</option>
+                                <!-- Opciones dinamicas -->
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="edit-idProveedor" class="form-label">Proveedor:</label>
+                            <select id="edit-idProveedor" name="idProveedor" required class="form-select">
+                                <option value="">Seleccione un proveedor</option>
+                                <option value="" disabled>Cargando...</option>
+                                <!-- Opciones dinamicas -->
                             </select>
                         </div>
                         <div class="col-12">
