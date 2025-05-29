@@ -52,6 +52,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         echo json_encode(['success' => false, 'message' => 'Correo electrónico inválido']);
         exit();
     }
+
+    }
     if (!$direccion || strlen($direccion) < 5 || strlen($direccion) > 255) {
         echo json_encode(['success' => false, 'message' => 'Dirección requerida (5-255 caracteres)']);
         exit();
@@ -106,6 +108,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'PUT') {
         echo json_encode(['success' => false, 'message' => 'Correo electrónico inválido']);
         exit();
     }
+
     if (!$direccion || strlen($direccion) < 5 || strlen($direccion) > 255) {
         echo json_encode(['success' => false, 'message' => 'Dirección requerida (5-255 caracteres)']);
         exit();

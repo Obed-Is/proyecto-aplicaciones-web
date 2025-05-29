@@ -1,0 +1,140 @@
+body {
+    background: linear-gradient(135deg, #f1f1f1, #cfe8ff);
+    margin: 0;
+    padding: 0;
+    color: #333;
+}
+
+.header {
+    background-color: #343a40;
+    color: white;
+    padding: 25px 0;
+    margin-bottom: 30px;
+    text-align: center;
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+.card {
+    border: none;
+    border-radius: 8px;
+    margin-bottom: 25px;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.05);
+}
+
+.card-header {
+    background-color: #007bff;
+    color: white;
+    border-radius: 8px 8px 0 0;
+    padding: 15px;
+}
+
+.card-title {
+    font-size: 1.25rem;
+    margin-bottom: 0;
+}
+
+.card-body {
+    padding: 20px;
+}
+
+.filter-section {
+    background-color: #fff;
+    border: 1px solid #e0e6ed;
+}
+
+.report-summary {
+    background-color: #e9ecef;
+    border: 1px solid #dee2e6;
+    border-radius: 8px;
+    padding: 20px;
+    text-align: center;
+    font-size: 1rem;
+    color: #495057;
+}
+
+.report-summary h5 {
+    font-size: 1.1rem;
+    margin-bottom: 10px;
+    color: #212529;
+}
+
+.report-item {
+    border-bottom: 1px solid #e0e6ed;
+    padding: 15px 0;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.report-item:last-child {
+    border-bottom: none;
+}
+
+.btn-detail {
+    background-color: #28a745;
+    border-color: #28a745;
+    color: white;
+    border-radius: 5px;
+    padding: 8px 15px;
+    font-size: 0.9rem;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.btn-detail:hover {
+    background-color: #218838;
+    border-color: #1e7e34;
+}
+
+#noReportsMessage {
+    padding: 20px;
+    text-align: center;
+    color: #6c757d;
+}
+
+.reports-list-card .card-body {
+    padding: 0;
+}
+
+#salesReportsList {
+    padding: 15px;
+}
+
+.form-control,
+.form-select {
+    border-radius: 5px;
+    border: 1px solid #ced4da;
+    padding: 0.7rem;
+    font-size: 0.95rem;
+}
+
+.form-control:focus,
+.form-select:focus {
+    border-color: #007bff;
+    box-shadow: 0 0 0 0.2rem rgba(0, 123, 255, 0.25);
+}
+
+.form-label {
+    font-weight: bold;
+    color: #495057;
+    margin-bottom: 0.5rem;
+    display: block;
+}
+
+.btn-primary {
+    border-radius: 5px;
+    padding: 10px 20px;
+    font-size: 1rem;
+    font-weight: 500;
+    transition: background-color 0.3s ease;
+}
+
+.btn-primary:hover {
+    background-color: #0056b3;
+}

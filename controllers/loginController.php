@@ -14,6 +14,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $_SESSION['usuario'] = $usuarioData['usuario_nombre'] . ' ' . $usuarioData['usuario_apellido'];
         $_SESSION['rol'] = $usuarioData['nombre_rol'];
         $_SESSION['idUsuario'] = $usuarioData['usuario_id'];
+        date_default_timezone_set('America/El_Salvador');
+        $_SESSION['fecha_entrada'] = date('Y-m-d H:i:s');
+        $userModel->inicioSesion();
         header('Location: ../views/dashboard.php');
         unset($_SESSION['credenciales']);
         exit();
