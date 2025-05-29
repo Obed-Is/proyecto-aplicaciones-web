@@ -46,6 +46,12 @@ body {
     table-layout: fixed;
 }
 
+.responsiv-tabla {
+    white-space: nowrap;
+    text-overflow: ellipsis;
+    overflow: hidden;
+}
+
 .filtro-opciones select {
     margin: 0 10px 0 10px;
     font-size: 0.9rem;

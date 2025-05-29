@@ -33,7 +33,7 @@ document.querySelector("form").addEventListener("submit", function () {
         icon: 'warning',
         title: "Enviando correo",
         html: "Espera un momentoo mientras se envia tu mensaje",
-        timer: 10000,
+        timer: 30000,
         timerProgressBar: true,
         didOpen: () => {
             Swal.showLoading();
