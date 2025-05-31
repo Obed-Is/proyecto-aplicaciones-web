@@ -6,6 +6,38 @@ if (!isset($_SESSION['usuario'])) {
     header('Location: login.php');
     exit();
 }
+
+// Verificar corte de caja activo antes de permitir acceso a ventas
+require_once '../models/db.php';
+require_once '../models/cortesCajaModel.php';
+$cortesModel = new CortesCajaModel();
+$idUsuario = $_SESSION['idUsuario'] ?? null;
+$rolUsuario = $_SESSION['rol'] ?? '';
+$corteActivo = null;
+if ($idUsuario) {
+    $corteActivo = $cortesModel->obtenerCorteActivo($idUsuario);
+}
+// Solo restringir si NO es administrador
+if ($rolUsuario !== 'administrador') {
+    if (!$corteActivo || !isset($corteActivo['estado']) || $corteActivo['estado'] !== 'activo') {
+        // Si no hay corte activo o está pausado/finalizado, redirigir o mostrar mensaje
+        echo '<!DOCTYPE html>
+        <html lang="es"><head>
+        <meta charset="UTF-8"><title>Corte de caja requerido</title>
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
+        </head><body class="bg-light">
+        <div class="container py-5 mt-5">
+            <div class="alert alert-warning text-center">
+                <h4 class="alert-heading">Corte de caja requerido</h4>
+                <p>Debes iniciar un corte de caja activo antes de poder realizar ventas.</p>
+                <hr>
+                <a href="cortes_caja.php" class="btn btn-primary">Ir a Cortes de Caja</a>
+            </div>
+        </div>
+        </body></html>';
+        exit();
+    }
+}
 ?>
 <!DOCTYPE html>
 <html lang="es">

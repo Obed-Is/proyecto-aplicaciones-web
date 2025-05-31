@@ -12,6 +12,13 @@ $ventasModel = new VentasModel();
 $db = new Database();
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    // Si viene ?all=1, devolver todas las ventas con detalles
+    if (isset($_GET['all'])) {
+        $ventas = $ventasModel->obtenerVentasConDetalles();
+        echo json_encode($ventas);
+        exit();
+    }
+
     $productos = $ventasModel->obtenerProductosActivos();
     $productos_normalizados = [];
     foreach ($productos as $p) {

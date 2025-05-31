@@ -68,5 +68,57 @@ class VentasModel
         return $productos;
     }
 
+    public function obtenerVentasConDetalles() {
+        $query = "SELECT v.id, v.fecha, v.cliente, v.correo_cliente, v.monto_total, v.monto_cliente, v.monto_devuelto, v.estado, u.nombreUsuario as usuario
+                  FROM ventas v
+                  LEFT JOIN usuarios u ON v.idUsuario = u.idUsuario
+                  ORDER BY v.fecha DESC";
+        $stmt = $this->db->getConnection()->prepare($query);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $ventas = [];
+        while ($row = $result->fetch_assoc()) {
+            $row['detalles'] = $this->obtenerDetallesVenta($row['id']);
+            $ventas[] = $row;
+        }
+        return $ventas;
+    }
+
+    // Obtener detalles de una venta por su ID
+    public function obtenerDetallesVenta($idVenta) {
+        $query = "SELECT d.idProducto, p.nombre, d.cantidad, d.precio
+                  FROM detalles_ventas d
+                  JOIN productos p ON d.idProducto = p.id
+                  WHERE d.idVenta = ?";
+        $stmt = $this->db->getConnection()->prepare($query);
+        $stmt->bind_param('i', $idVenta);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $detalles = [];
+        while ($row = $result->fetch_assoc()) {
+            $detalles[] = $row;
+        }
+        return $detalles;
+    }
+
+    // Obtener ventas por idCorteCaja
+    public function obtenerVentasPorCorte($idCorteCaja) {
+        $sql = "SELECT v.*, u.nombre as usuario
+                FROM ventas v
+                LEFT JOIN usuarios u ON v.idUsuario = u.idUsuario
+                WHERE v.idCorteCaja = ?";
+        $stmt = $this->db->getConnection()->prepare($sql);
+        $stmt->bind_param('i', $idCorteCaja);
+        $stmt->execute();
+        $result = $stmt->get_result();
+        $ventas = [];
+        while ($row = $result->fetch_assoc()) {
+            // Obtener detalles de la venta
+            $row['detalles'] = $this->obtenerDetallesVenta($row['id']);
+            $ventas[] = $row;
+        }
+        return $ventas;
+    }
+
 }
 ?>

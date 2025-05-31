@@ -68,12 +68,12 @@ if (!isset($_SESSION['usuario'])) {
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>ID</th>
-                            <th>Nombre</th>
-                            <th>Teléfono</th>
-                            <th>Correo</th>
-                            <th>Dirección</th>
-                            <th>Acciones</th>
+                            <th class="text-truncate">ID</th>
+                            <th class="text-truncate">Nombre</th>
+                            <th class="text-truncate">Teléfono</th>
+                            <th class="text-truncate">Correo</th>
+                            <th class="text-truncate">Dirección</th>
+                            <th class="text-truncate">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tablaProveedores">

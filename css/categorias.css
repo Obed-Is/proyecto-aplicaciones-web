@@ -37,7 +37,7 @@ body {
     transform: translateY(-2px);
 }
 
- .transicion-fila {
+.transicion-fila {
   opacity: 0;
   transform: translateY(20px);
   transition: opacity 0.3s ease-out, transform 0.3s ease-out;
@@ -55,6 +55,17 @@ body {
     background-color: #f8f9fa;
     color: #343a40;
     font-weight: 600;
+}
+
+/* --- NUEVO: Estilo para cortar texto y poner puntos suspensivos en celdas de tabla --- */
+.table th,
+.table td,
+.tabla-usuarios th,
+.tabla-usuarios td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
 }
 
 .table tbody tr {
