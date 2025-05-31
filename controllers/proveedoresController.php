@@ -53,7 +53,6 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         exit();
     }
 
-    }
     if (!$direccion || strlen($direccion) < 5 || strlen($direccion) > 255) {
         echo json_encode(['success' => false, 'message' => 'Dirección requerida (5-255 caracteres)']);
         exit();

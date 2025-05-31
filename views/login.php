@@ -7,7 +7,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Inicio de sesion - Oro Verde</title>
-    <link rel="shortcut icon" href="../logo.png" type="image/x-icon">
+    <link rel="shortcut icon" href="../logo.webp" type="image/x-icon">
     <!-- Bootstrap 5 -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <!-- Bootstrap Icons -->
@@ -19,7 +19,7 @@
 
     <div class="card p-4" style="width: 100%; max-width: 400px;">
         <div class="text-center mb-3">
-            <img src="../logo.png" alt="Oro Verde" class="logo mb-2">
+            <img src="../logo.webp" alt="Oro Verde" class="logo mb-2">
             <h4 class="fw-bold text-success">Oro Verde</h4>
             <p class="text-muted">Sistema de Acceso</p>
         </div>
@@ -49,10 +49,6 @@
                 <?php unset($_SESSION['errores']['login']); // se borra el mensaje de un solo para que no se repita ?>
             <?php endif; ?>
         </form>
-
-        <div class="text-center mt-3">
-            <a href="#" class="text-decoration-none small text-muted">¿Olvidaste tu contraseña?</a>
-        </div>
     </div>
 
     <script>

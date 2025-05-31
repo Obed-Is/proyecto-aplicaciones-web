@@ -19,14 +19,37 @@ document.getElementById('logout-btn').addEventListener('click', () => {
         text: '¿Quieres cerrar sesion?',
         icon: 'warning',
         showCancelButton: true,
-        confirmButtonText: 'Si, cerrar sesion',
+        confirmButtonText: 'Sí, cerrar sesion',
         cancelButtonText: 'Cancelar'
     }).then((result) => {
         if (result.isConfirmed) {
-            window.location.href = '../controllers/logout.php';
+            fetch('../controllers/logout.php', { method: 'POST' })
+                .then(res => {
+                    if (!res.ok) throw new Error('Error en la respuesta del servidor');
+                    return res.json();
+                })
+                .then(data => {
+                    if (data.success) {
+                        window.location.href = '../views/login.php';
+                    } else {
+                        Swal.fire({
+                            icon: 'warning',
+                            title: 'Atencion',
+                            text: data.message,
+                        });
+                    }
+                })
+                .catch(error => {
+                    console.error('Error en fetch logout:', error);
+                    Swal.fire({
+                        icon: 'error',
+                        title: 'Error',
+                        text: 'Ocurrio un problema al cerrar sesion',
+                    });
+                });
         }
-    })
-})
+    });
+});
 //aqui se llaman los datos de los usuarios recibidos del controllador
 async function cargarUsuarios() {
     try {

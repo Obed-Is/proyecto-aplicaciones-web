@@ -98,6 +98,13 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             'fechaVenta' => date('Y-m-d H:i:s')
         ];
         $_SESSION['productos'] = $productos;
+        if(!isset($_SESSION['totalVentasCaja'])){
+            $_SESSION['numeroDeVentas'] = 1;
+            $_SESSION['totalVentasCaja'] = $totalVenta;
+        }else{
+            $_SESSION['numeroDeVentas'] += 1;
+            $_SESSION['totalVentasCaja'] += $totalVenta;
+        }
 
         echo json_encode([
             'success' => true,

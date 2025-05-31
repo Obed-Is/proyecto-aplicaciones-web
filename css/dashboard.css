@@ -21,7 +21,7 @@ body {
   backdrop-filter: blur(10px);
   background: #ffffffb3;
   border-radius: 1rem;
-  padding: 2rem;
+  padding: 1.5rem;
   text-align: center;
   box-shadow: 0 8px 20px rgba(0, 0, 0, 0.1);
   transition: transform 0.3s, box-shadow 0.3s;
@@ -30,7 +30,7 @@ body {
 }
 
 .glass-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-1px);
   box-shadow: 0 12px 25px rgba(0, 0, 0, 0.15);
 }
 

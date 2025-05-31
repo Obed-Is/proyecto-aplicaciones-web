@@ -19,22 +19,69 @@ if ($idUsuario) {
 }
 // Solo restringir si NO es administrador
 if ($rolUsuario !== 'administrador') {
-    if (!$corteActivo || !isset($corteActivo['estado']) || $corteActivo['estado'] !== 'activo') {
-        // Si no hay corte activo o está pausado/finalizado, redirigir o mostrar mensaje
-        echo '<!DOCTYPE html>
-        <html lang="es"><head>
-        <meta charset="UTF-8"><title>Corte de caja requerido</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
-        </head><body class="bg-light">
-        <div class="container py-5 mt-5">
-            <div class="alert alert-warning text-center">
-                <h4 class="alert-heading">Corte de caja requerido</h4>
-                <p>Debes iniciar un corte de caja activo antes de poder realizar ventas.</p>
-                <hr>
-                <a href="cortes_caja.php" class="btn btn-primary">Ir a Cortes de Caja</a>
+    if (!isset($_SESSION['corteCaja'])) {
+        ?>
+        <!DOCTYPE html>
+        <html lang="es">
+        <head>
+            <meta charset="UTF-8">
+            <title>Corte de caja requerido</title>
+            <link rel="shortcut icon" href="../logo.webp" type="image/x-icon" />
+            <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.min.css">
+            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+            <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            <style>
+                body {
+                    background: linear-gradient(135deg, #f1f1f1, #cfe8ff);
+                }
+            </style>
+        </head>
+        <body class="bg-light">
+            <?php include "includes/navbar.php" ?>
+            <div class="container py-5 mt-5 d-flex justify-content-center">
+                <div class="card shadow-lg border-0" style="max-width: 500px; width: 100%;">
+                    <div class="card-body text-center p-4">
+                        <div class="mb-3">
+                            <i class="bi bi-exclamation-triangle-fill text-warning fs-1"></i>
+                        </div>
+                        <h4 class="card-title fw-bold mb-3 text-warning">Corte de caja requerido</h4>
+                        <p class="card-text text-muted">
+                            Para continuar con las ventas, debes iniciar un corte de caja activo.
+                        </p>
+                        <hr class="my-4">
+                        <a href="inicio_cortes_caja.php" class="btn btn-outline-primary">
+                            <i class="bi bi-box-arrow-in-right me-2"></i>Ir a Cortes de Caja
+                        </a>
+                    </div>
+                </div>
             </div>
-        </div>
-        </body></html>';
+            <script>
+                const contenedorFecha = document.getElementById('current-date');
+                const fechaData = new Date();
+                const formatoFecha = fechaData.toLocaleDateString('es-ES', {
+                    weekday: 'long', year: 'numeric', month: 'long', day: 'numeric'
+                });
+                contenedorFecha.textContent = formatoFecha;
+
+                document.getElementById('logout-btn').addEventListener('click', () => {
+                    Swal.fire({
+                        title: '¿Estás seguro?',
+                        text: '¿Quieres cerrar sesion?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonText: 'Si, cerrar sesion',
+                        cancelButtonText: 'Cancelar'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            window.location.href = '../controllers/logout.php';
+                        }
+                    })
+                })
+            </script>
+        </body>
+        </html>
+        <?php
         exit();
     }
 }
@@ -46,7 +93,7 @@ if ($rolUsuario !== 'administrador') {
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Dashboard de Ventas | MyStore Pro</title>
-    <link rel="shortcut icon" href="../logo.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="../logo.webp" type="image/x-icon" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">

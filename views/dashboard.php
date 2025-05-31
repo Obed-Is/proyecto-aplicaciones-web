@@ -14,7 +14,7 @@ if (!isset($_SESSION['usuario'])) {
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Panel administrativo - Oro Verde</title>
-  <link rel="shortcut icon" href="../logo.png" type="image/x-icon" />
+  <link rel="shortcut icon" href="../logo.webp" type="image/x-icon" />
   <!-- PARA USO DE Bootstrap -->
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
   <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
@@ -95,11 +95,22 @@ if (!isset($_SESSION['usuario'])) {
           <h5>Reportar Problema</h5>
         </a>
       </div>
-      <!-- Enlace a cortes de cajas -->
+
+      <!-- Enlace a reporte de cortes de cajas -->
       <div class="col">
-        <a href="cortes_caja.php" class="glass-card w-100 text-dark text-decoration-none d-block">
-          <i class="bi bi-exclamation-triangle-fill glass-icon"></i>
-          <h5>Cortes de cajas</h5>
+        <a href="cortes_caja.php"
+          class="glass-card w-100 text-dark text-decoration-none d-block ">
+          <i class="bi bi-cash-coin glass-icon"></i>
+          <h5>Reporte de cortes de caja</h5>
+        </a>
+      </div>
+
+      <!-- Enlace a inicio de cortes de cajas -->
+      <div class="col">
+        <a href="inicio_cortes_caja.php"
+          class="glass-card w-100 text-dark text-decoration-none d-block">
+          <i class="bi bi-cash-stack glass-icon"></i>
+          <h5>Control corte de caja</h5>
         </a>
       </div>
     </div>
