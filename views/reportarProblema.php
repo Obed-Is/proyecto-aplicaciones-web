@@ -13,7 +13,7 @@ if (!isset($_SESSION['usuario'])) {
     <meta charset="UTF-8">
     <title>Enviar Reporte a Administracion - Oro Verde</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <link rel="shortcut icon" href="../logo.png" type="image/x-icon">
+    <link rel="shortcut icon" href="../logo.webp" type="image/x-icon">
     <!-- Bootstrap -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
@@ -33,7 +33,7 @@ if (!isset($_SESSION['usuario'])) {
     <div class="container-fluid">
         <div class="report-container">
             <div class="report-header text-center mb-4">
-                <img src="../logo.png" alt="Logo Oro Verde" class="img-fluid" style="max-height: 80px;">
+                <img src="../logo.webp" alt="Logo Oro Verde" class="img-fluid" style="max-height: 80px;">
                 <h2 class="mt-3">Enviar Reporte</h2>
                 <p class="text-muted">Envia un informe o reporta un problema a la administracion</p>
             </div>

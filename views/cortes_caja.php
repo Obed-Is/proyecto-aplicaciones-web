@@ -13,7 +13,7 @@ $esAdmin = (isset($_SESSION['rol']) && $_SESSION['rol'] === 'administrador');
 <head>
     <meta charset="UTF-8">
     <title>Cortes de Caja - Oro Verde</title>
-    <link rel="shortcut icon" href="../logo.png" type="image/x-icon" />
+    <link rel="shortcut icon" href="../logo.webp" type="image/x-icon" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet" />
     <script defer src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
