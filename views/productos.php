@@ -102,17 +102,17 @@ if (!isset($_SESSION['usuario'])) {
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th>Código</th>
-                            <th>Nombre</th>
-                            <th>Descripción</th>
-                            <th>Precio</th>
-                            <th>Stock</th>
-                            <th>Estado</th>
-                            <th>Categoría</th>
-                            <th>Proveedor</th>
-                            <th>Stock Mínimo</th>
-                            <th>Imagen</th>
-                            <th>Acciones</th>
+                            <th class="text-truncate">Código</th>
+                            <th class="text-truncate">Nombre</th>
+                            <th class="text-truncate">Descripción</th>
+                            <th class="text-truncate">Precio</th>
+                            <th class="text-truncate">Stock</th>
+                            <th class="text-truncate">Estado</th>
+                            <th class="text-truncate">Categoría</th>
+                            <th class="text-truncate">Proveedor</th>
+                            <th class="text-truncate">Stock Mínimo</th>
+                            <th class="text-truncate">Imagen</th>
+                            <th class="text-truncate">Acciones</th>
                         </tr>
                     </thead>
                     <tbody id="tablaProductos">

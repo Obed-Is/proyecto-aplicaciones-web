@@ -12,8 +12,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $input = json_decode(file_get_contents('php://input'), true);
         $filtro = trim($input['filtroBusqueda'] ?? '');
         if (!empty($filtro)) {
-            $nombre_producto = $filtro . "%";
-            $peticion = $productosModel->buscarProducto($nombre_producto);
+            $filtroLike = $filtro . "%";
+            $peticion = $productosModel->buscarProducto($filtroLike);
             header('Content-Type: application/json');
             echo json_encode($peticion);
             exit();
@@ -44,16 +44,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$codigo || strlen($codigo) > 4) {
                 echo json_encode(['success' => false, 'message' => 'Código requerido y máximo 4 caracteres.']);
                 exit();
+            } else if ($productosModel->codigoExiste($codigo, $id)) {
+                echo json_encode(['success' => false, 'message' => 'Ya hay un producto con ese código.']);
+                exit();
             }
             if (!$nombre || strlen($nombre) < 3 || strlen($nombre) > 40) {
                 echo json_encode(['success' => false, 'message' => 'Nombre requerido (3-40 caracteres).']);
+                exit();
+            } else if (!preg_match('/^[\p{L}\p{N}\s\-\+\.\,\(\)\'"]+$/u', $nombre)) {
+                echo json_encode(['success' => false, 'message' => 'Nombre de producto inválido. Use solo letras, números y caracteres comunes.']);
                 exit();
             }
             if (!$descripcion || strlen($descripcion) < 5 || strlen($descripcion) > 100) {
                 echo json_encode(['success' => false, 'message' => 'Descripción requerida (5-100 caracteres).']);
                 exit();
             }
-            if ($precio < 0) {
+            if ($precio <= 0) {
                 echo json_encode(['success' => false, 'message' => 'Precio inválido.']);
                 exit();
             }
@@ -101,16 +107,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             if (!$codigo || strlen($codigo) > 4) {
                 echo json_encode(['success' => false, 'message' => 'Código requerido y máximo 4 caracteres.']);
                 exit();
+            } else if ($productosModel->codigoExiste($codigo)) {
+                echo json_encode(['success' => false, 'message' => 'Ya hay un producto con ese código.']);
+                exit();
             }
             if (!$nombre || strlen($nombre) < 3 || strlen($nombre) > 40) {
                 echo json_encode(['success' => false, 'message' => 'Nombre requerido (3-40 caracteres).']);
+                exit();
+            } else if (!preg_match('/^[\p{L}\p{N}\s\-\+\.\,\(\)\'"]+$/u', $nombre)) {
+                echo json_encode(['success' => false, 'message' => 'Nombre de producto inválido. Use solo letras, números y caracteres comunes.']);
                 exit();
             }
             if (!$descripcion || strlen($descripcion) < 5 || strlen($descripcion) > 100) {
                 echo json_encode(['success' => false, 'message' => 'Descripción requerida (5-100 caracteres).']);
                 exit();
             }
-            if ($precio < 0) {
+            if ($precio <= 0) {
                 echo json_encode(['success' => false, 'message' => 'Precio inválido.']);
                 exit();
             }
@@ -173,10 +185,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         header('Content-Type: application/json');
         if ($ok) {
             echo json_encode(['success' => true, 'message' => 'Producto eliminado correctamente.']);
-            header("Location: ../views/productos.php?mensaje=eliminado");
         } else {
             echo json_encode(['success' => false, 'message' => 'Error al eliminar el producto.']);
-            header("Location: ../views/productos.php?mensaje=no se pudo eliminar");
         }
         exit();
     }

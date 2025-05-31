@@ -95,6 +95,13 @@ if (!isset($_SESSION['usuario'])) {
           <h5>Reportar Problema</h5>
         </a>
       </div>
+      <!-- Enlace a cortes de cajas -->
+      <div class="col">
+        <a href="cortes_caja.php" class="glass-card w-100 text-dark text-decoration-none d-block">
+          <i class="bi bi-exclamation-triangle-fill glass-icon"></i>
+          <h5>Cortes de cajas</h5>
+        </a>
+      </div>
     </div>
   </div>
 

@@ -122,6 +122,25 @@ class ProductosModel {
     return $productos;
 }
 
+    public function codigoExiste($codigo, $excluirId = null) {
+        $query = "SELECT COUNT(*) as total FROM productos WHERE codigo = ?";
+        if ($excluirId) {
+            $query .= " AND id != ?";
+        }
+        $stmt = $this->db->getConnection()->prepare($query);
+        if ($excluirId) {
+            $stmt->bind_param('si', $codigo, $excluirId);
+        } else {
+            $stmt->bind_param('s', $codigo);
+        }
+        $stmt->execute();
+        $stmt->bind_result($total);
+        $stmt->fetch();
+        return $total > 0;
+    }
+
+
+
 }
 
 

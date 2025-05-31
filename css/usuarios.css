@@ -46,6 +46,14 @@ body {
     table-layout: fixed;
 }
 
+.tabla-usuarios th,
+.tabla-usuarios td {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 180px;
+}
+
 .responsiv-tabla {
     white-space: nowrap;
     text-overflow: ellipsis;
