@@ -5,7 +5,6 @@ const formatoFecha = fechaData.toLocaleDateString('es-ES', {
 });
 contenedorFecha.textContent = formatoFecha;
 
-<<<<<<< Updated upstream
 document.getElementById('logout-btn').addEventListener('click', () => {
     Swal.fire({
         title: '¿Estás seguro?',
@@ -20,7 +19,7 @@ document.getElementById('logout-btn').addEventListener('click', () => {
         }
     })
 })
-=======
+
 // Solo agregar listener si existe el botón logout
 const logoutBtn = document.getElementById('logout-btn');
 if (logoutBtn) {
@@ -62,7 +61,6 @@ if (logoutBtn) {
         });
     });
 }
->>>>>>> Stashed changes
 
 document.querySelectorAll('.editar-btn').forEach(btn => {
     btn.addEventListener('click', async function (e) {
