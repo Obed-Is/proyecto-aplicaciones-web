@@ -5,6 +5,7 @@ if (!isset($_SESSION['usuario'])) {
     header('Location: login.php');
     exit();
 }
+$esAdmin = ($_SESSION['rol'] == 'administrador');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -25,7 +26,7 @@ if (!isset($_SESSION['usuario'])) {
     <script defer src="../js/categorias.js"></script>
 </head>
 
-<body>
+<body <?php if ($esAdmin) echo 'data-admin="1"'; ?>>
     <?php include 'includes/navbar.php' ?>
 
     <div class="container mt-5">
@@ -39,11 +40,13 @@ if (!isset($_SESSION['usuario'])) {
                     </div>
                     <button id="btnBuscar" class="btn btn-light ms-2">Buscar</button>
             </div>
+            <?php if ($esAdmin): ?>
             <div class="col-md-6 text-md-end mt-3 mt-md-0">
                 <button onclick="return validarFormulario()" class="btn btn-primary btn-agregar-categoria" id="btnAddCategoria">
                     <i class="bi bi-plus-circle pe-3"></i>Agregar Categoria
                 </button>
             </div>
+            <?php endif; ?>
         </div>
 
         <div class="card p-4 shadow-sm category-card">
@@ -54,7 +57,9 @@ if (!isset($_SESSION['usuario'])) {
                             <th scope="col">#</th>
                             <th scope="col">Nombre de la Categoria</th>
                             <th scope="col">Descripcion</th>
+                            <?php if ($esAdmin): ?>
                             <th scope="col" class="text-center">Acciones</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody>
@@ -66,5 +71,4 @@ if (!isset($_SESSION['usuario'])) {
     </div>
 
 </body>
-
 </html>

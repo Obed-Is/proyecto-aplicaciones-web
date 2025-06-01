@@ -4,8 +4,23 @@ require_once '../models/cortesCajaModel.php';
 
 session_start();
 
+$fechaInicio = $_POST['fechaInicio'] ?? '';
+$fechaFin = $_POST['fechaFin'] ?? '';
+
 $cortesModel = new CortesCajaModel();
 $cortes = $cortesModel->obtenerCortesCaja();
+
+// Filtro por fecha si se reciben parámetros
+if ($fechaInicio || $fechaFin) {
+    $cortes = array_filter($cortes, function($corte) use ($fechaInicio, $fechaFin) {
+        $fecha = $corte['fecha'];
+        $ok = true;
+        if ($fechaInicio) $ok = $ok && ($fecha >= $fechaInicio);
+        if ($fechaFin) $ok = $ok && ($fecha <= $fechaFin);
+        return $ok;
+    });
+    $cortes = array_values($cortes);
+}
 
 header("Content-Type: application/vnd.ms-excel; charset=utf-8");
 header("Content-Disposition: attachment; filename=reporte_cortes_caja.xls");

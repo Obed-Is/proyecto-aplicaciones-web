@@ -31,33 +31,7 @@ $esAdmin = (isset($_SESSION['rol']) && $_SESSION['rol'] === 'administrador');
         <h2 class="text-center dashboard-title mb-4 px-2">
             <?php echo $esAdmin ? 'Cortes de Caja (Administrador)' : 'Gestión de Cortes de Caja'; ?>
         </h2>
-        <?php if (!$esAdmin): ?>
-            <div class="card p-4 shadow-sm mb-4">
-                <form id="formCorteCaja" class="row g-3">
-                    <div class="col-md-4">
-                        <label for="monto_inicial" class="form-label">Monto Inicial:</label>
-                        <input type="number" step="0.01" id="monto_inicial" name="monto_inicial" required
-                            class="form-control">
-                    </div>
-                    <div class="col-md-8 d-flex align-items-end">
-                        <button type="button" id="btnIniciarCorte" class="btn btn-success me-2">
-                            <i class="bi bi-play-circle"></i> Iniciar Corte
-                        </button>
-                        <!-- Botón unificado para pausar/reanudar, se controla por JS -->
-                        <button type="button" id="btnPausarReanudarCorte" style="display:none;"
-                            class="btn btn-warning me-2">
-                            <i class="bi bi-pause-circle"></i> Reanudar Corte
-                        </button>
-                        <button type="button" id="btnPausarCorte" class="btn btn-warning me-2" style="display:none;">
-                            <i class="bi bi-pause-circle"></i> Pausar Corte
-                        </button>
-                        <button type="button" id="btnFinalizarCorte" class="btn btn-danger" style="display:none;">
-                            <i class="bi bi-stop-circle"></i> Finalizar Corte
-                        </button>
-                    </div>
-                </form>
-            </div>
-        <?php else: ?>
+        <?php if ($esAdmin): ?>
             <div class="mb-4 d-flex justify-content-end gap-2">
                 <a href="../controllers/cortes_caja_excel.php" class="btn btn-success">
                     <i class="bi bi-file-earmark-excel"></i> Descargar Excel
@@ -67,12 +41,36 @@ $esAdmin = (isset($_SESSION['rol']) && $_SESSION['rol'] === 'administrador');
                 </a>
             </div>
         <?php endif; ?>
+
+        <div class="card p-3 mb-3">
+            <div class="row g-2 align-items-end">
+                <?php if ($esAdmin): ?>
+                <div class="col-md-4">
+                    <label for="filtroUsuarioCorte" class="form-label mb-0">Buscar usuario</label>
+                    <input type="text" id="filtroUsuarioCorte" class="form-control" placeholder="Nombre de usuario..." />
+                </div>
+                <?php endif; ?>
+                <div class="col-md-4">
+                    <label for="fechaInicioCorte" class="form-label mb-0">Fecha inicio</label>
+                    <input type="date" id="fechaInicioCorte" class="form-control" />
+                </div>
+                <div class="col-md-4">
+                    <label for="fechaFinCorte" class="form-label mb-0">Fecha fin</label>
+                    <input type="date" id="fechaFinCorte" class="form-control" />
+                </div>
+                <div class="col-md-4 d-flex gap-2">
+                    <button id="btnFiltrarCortes" class="btn btn-primary flex-fill" type="button"><i class="bi bi-filter"></i> Filtrar</button>
+                    <button id="btnLimpiarCortes" class="btn btn-secondary flex-fill" type="button"><i class="bi bi-x-circle"></i> Limpiar</button>
+                </div>
+            </div>
+        </div>
+
         <div class="card shadow-sm">
             <div class="table-responsive">
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="text-truncate">ID</th>
+                            <th class="text-truncate">#</th>
                             <th class="text-truncate">Fecha</th>
                             <th class="text-truncate">Hora Inicio</th>
                             <th class="text-truncate">Hora Fin</th>
@@ -82,7 +80,6 @@ $esAdmin = (isset($_SESSION['rol']) && $_SESSION['rol'] === 'administrador');
                             <th class="text-truncate">Total Ganancia</th>
                             <th class="text-truncate">Usuario</th>
                             <th class="text-truncate">Estado</th>
-                            <!-- <th>Acciones</th> -->
                         </tr>
                     </thead>
                     <tbody id="tablaCortesCaja">

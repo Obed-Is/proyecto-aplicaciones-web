@@ -43,6 +43,49 @@ document.getElementById('logout-btn').addEventListener('click', () => {
     });
 });
 
+
+// Solo agregar listener si existe el botón logout
+const logoutBtn = document.getElementById('logout-btn');
+if (logoutBtn) {
+    logoutBtn.addEventListener('click', () => {
+        Swal.fire({
+            title: '¿Estas seguro?',
+            text: '¿Quieres cerrar sesion?',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Sí, cerrar sesion',
+            cancelButtonText: 'Cancelar'
+        }).then((result) => {
+            if (result.isConfirmed) {
+                fetch('../controllers/logout.php', { method: 'POST' })
+                    .then(res => {
+                        if (!res.ok) throw new Error('Error en la respuesta del servidor');
+                        return res.json();
+                    })
+                    .then(data => {
+                        if (data.success) {
+                            window.location.href = '../views/login.php';
+                        } else {
+                            Swal.fire({
+                                icon: 'warning',
+                                title: 'Atencion',
+                                text: data.message,
+                            });
+                        }
+                    })
+                    .catch(error => {
+                        console.error('Error en fetch logout:', error);
+                        Swal.fire({
+                            icon: 'error',
+                            title: 'Error',
+                            text: 'Ocurrio un problema al cerrar sesion',
+                        });
+                    });
+            }
+        });
+    });
+}
+
 document.querySelectorAll('.editar-btn').forEach(btn => {
     btn.addEventListener('click', async function (e) {
         e.preventDefault();
@@ -128,12 +171,12 @@ async function cargarCategoriasYProveedores() {
     try { categorias = await catRes.json(); } catch {}
     const selectCat = document.getElementById('idCategoria');
     const selectCatEdit = document.getElementById('edit-idCategoria');
-    selectCat.innerHTML = '<option value="">Seleccione una categoría</option>';
-    selectCatEdit.innerHTML = '<option value="">Seleccione una categoría</option>';
+    if (selectCat) selectCat.innerHTML = '<option value="">Seleccione una categoría</option>';
+    if (selectCatEdit) selectCatEdit.innerHTML = '<option value="">Seleccione una categoría</option>';
     if (Array.isArray(categorias)) {
         categorias.forEach(cat => {
-            selectCat.innerHTML += `<option value="${cat.id_categoria}">${cat.nombre_categoria}</option>`;
-            selectCatEdit.innerHTML += `<option value="${cat.id_categoria}">${cat.nombre_categoria}</option>`;
+            if (selectCat) selectCat.innerHTML += `<option value="${cat.id_categoria}">${cat.nombre_categoria}</option>`;
+            if (selectCatEdit) selectCatEdit.innerHTML += `<option value="${cat.id_categoria}">${cat.nombre_categoria}</option>`;
         });
     }
 
@@ -142,12 +185,12 @@ async function cargarCategoriasYProveedores() {
     try { proveedores = await provRes.json(); } catch {}
     const selectProv = document.getElementById('idProveedor');
     const selectProvEdit = document.getElementById('edit-idProveedor');
-    selectProv.innerHTML = '<option value="">Seleccione un proveedor</option>';
-    selectProvEdit.innerHTML = '<option value="">Seleccione un proveedor</option>';
+    if (selectProv) selectProv.innerHTML = '<option value="">Seleccione un proveedor</option>';
+    if (selectProvEdit) selectProvEdit.innerHTML = '<option value="">Seleccione un proveedor</option>';
     if (Array.isArray(proveedores)) {
         proveedores.forEach(prov => {
-            selectProv.innerHTML += `<option value="${prov.id}">${prov.nombre}</option>`;
-            selectProvEdit.innerHTML += `<option value="${prov.id}">${prov.nombre}</option>`;
+            if (selectProv) selectProv.innerHTML += `<option value="${prov.id}">${prov.nombre}</option>`;
+            if (selectProvEdit) selectProvEdit.innerHTML += `<option value="${prov.id}">${prov.nombre}</option>`;
         });
     }
 }
@@ -181,6 +224,7 @@ async function mostrarProductos(productos = null) {
             <td class="td-imagen" data-id="${producto.id}">
                 <img src="../img/imgFaltante.png" alt="Sin imagen" width="60" height="60" class="img-sustituta rounded" />
             </td>
+            ${esAdmin ? `
             <td>
                 <a href="#" class="btn btn-sm btn-primary editar-btn"
                     data-id="${producto.id}"
@@ -196,6 +240,7 @@ async function mostrarProductos(productos = null) {
                 ><i class="bi bi-pencil-square"></i></a>
                 <a href="../controllers/productosController.php?action=delete&id=${producto.id}" class="btn btn-sm btn-danger" onclick="return confirm('¿Seguro que deseas eliminar este producto?')"><i class="bi bi-trash"></i></a>
             </td>
+            ` : ''}
         `;
         tabla.appendChild(tr);
     });
@@ -280,29 +325,38 @@ document.addEventListener('DOMContentLoaded', async function () {
     });
 });
 
-document.getElementById('formAgregarProducto').addEventListener('submit', async function(e) {
-    e.preventDefault();
-    const form = e.target;
-    const formData = new FormData(form);
-    const res = await fetch('../controllers/productosController.php', {
-        method: 'POST',
-        body: formData
+// Solo agregar listener si existe el formulario de agregar producto
+const formAgregarProducto = document.getElementById('formAgregarProducto');
+if (formAgregarProducto) {
+    formAgregarProducto.addEventListener('submit', async function(e) {
+        e.preventDefault();
+        const form = e.target;
+        const formData = new FormData(form);
+        const res = await fetch('../controllers/productosController.php', {
+            method: 'POST',
+            body: formData
+        });
+        const data = await res.json();
+        if (data.success) {
+            alertaEsquinaSuperior('success', data.message);
+            form.reset();
+            await mostrarProductos();
+        } else {
+            alertaEsquinaSuperior('error', data.message || 'No se pudo agregar el producto');
+        }
     });
-    const data = await res.json();
-    if (data.success) {
-        alertaEsquinaSuperior('success', data.message);
-        form.reset();
-        await mostrarProductos();
-    } else {
-        alertaEsquinaSuperior('error', data.message || 'No se pudo agregar el producto');
-    }
-});
+}
 
-document.getElementById('btnBuscarProducto').addEventListener('click', function(e) {
-    e.preventDefault();
-    productosFiltro();
-});
-document.getElementById('buscarProducto').addEventListener('change', productosFiltro);
+// Solo agregar listeners de búsqueda si existen los elementos
+const btnBuscarProducto = document.getElementById('btnBuscarProducto');
+const buscarProducto = document.getElementById('buscarProducto');
+if (btnBuscarProducto && buscarProducto) {
+    btnBuscarProducto.addEventListener('click', function(e) {
+        e.preventDefault();
+        productosFiltro();
+    });
+    buscarProducto.addEventListener('change', productosFiltro);
+}
 
 function productosFiltro() {
     const filtroBusqueda = document.getElementById('buscarProducto').value.trim();
@@ -329,5 +383,64 @@ function productosFiltro() {
     .catch(err => {
         alertaEsquinaSuperior('error', 'Ocurrió un error al buscar productos');
         console.log(err);
+    });
+}
+
+// Exportar productos a Excel
+const btnExportarProductosExcel = document.getElementById('btnExportarProductosExcel');
+if (btnExportarProductosExcel) {
+    btnExportarProductosExcel.addEventListener('click', function(e) {
+        e.preventDefault();
+        // Crea un formulario temporal para enviar por POST y abrir en nueva pestaña
+        const form = document.createElement('form');
+        form.method = 'POST';
+        form.action = '../controllers/productosController.php';
+        form.target = '_blank';
+        const inputExportar = document.createElement('input');
+        inputExportar.type = 'hidden';
+        inputExportar.name = 'exportar';
+        inputExportar.value = 'excel';
+        form.appendChild(inputExportar);
+        document.body.appendChild(form);
+        form.submit();
+        document.body.removeChild(form);
+    });
+}
+
+// Importar productos desde Excel
+const inputImportarProductos = document.getElementById('inputImportarProductos');
+const formImportarProductos = document.getElementById('formImportarProductos');
+if (inputImportarProductos && formImportarProductos) {
+    inputImportarProductos.addEventListener('change', function() {
+        if (!inputImportarProductos.files.length) return;
+        const formData = new FormData();
+        formData.append('importar', 'excel');
+        formData.append('archivo', inputImportarProductos.files[0]);
+        fetch('../controllers/productosController.php', {
+            method: 'POST',
+            body: formData
+        })
+        .then(async res => {
+            // Lee el cuerpo solo una vez como texto
+            const text = await res.text();
+            let data;
+            try {
+                data = JSON.parse(text);
+            } catch (e) {
+                console.error('Respuesta no JSON:', text);
+                alertaEsquinaSuperior('error', 'Respuesta inesperada del servidor');
+                return;
+            }
+            if (!data.success && data.errores && data.errores.length > 0) {
+                console.error('Errores de importación:', data.errores);
+            }
+            alertaEsquinaSuperior(data.success ? 'success' : 'error', data.message);
+            if (data.success) mostrarProductos();
+        })
+        .catch((err) => {
+            alertaEsquinaSuperior('error', 'Error al importar productos');
+            console.error('Error al importar productos:', err);
+        });
+        inputImportarProductos.value = '';
     });
 }

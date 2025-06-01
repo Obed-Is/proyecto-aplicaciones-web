@@ -11,7 +11,9 @@
                 <span class="me-2 text-light fw-semibold text-truncate d-inline-block" style="max-width: 150px;">
                     <?php echo (isset($_SESSION['usuario'])) ? $_SESSION['usuario'] : ''; ?>
                 </span>
-                <span class="me-3 text-light small">| Administrador</span>
+                <?php if (isset($_SESSION['rol'])): ?>
+                    <span class="me-3 text-light small">| <?php echo ucfirst($_SESSION['rol']); ?></span>
+                <?php endif; ?>
                 <button class="btn btn-outline-light btn-sm" id="logout-btn">
                     <i class="bi bi-box-arrow-right"></i> Cerrar sesion
                 </button>

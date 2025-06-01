@@ -23,19 +23,29 @@ class ProductosModel {
         $query = "INSERT INTO productos (codigo, nombre, descripcion, precio, stock, estado, idCategoria, stock_minimo, imagen, idProveedor) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)";
         $stmt = $this->db->getConnection()->prepare($query);
 
+        // Permitir que $imagen sea null (por ejemplo, en importación)
+        $imagenData = null;
         if ($imagen && isset($imagen['tmp_name']) && is_uploaded_file($imagen['tmp_name'])) {
             $imagenData = file_get_contents($imagen['tmp_name']);
+        } else if (is_string($imagen) && $imagen !== '') {
+            $imagenData = $imagen;
         } else {
             $imagenData = null;
         }
 
-        // Tipos: sssdisiibi
-        $stmt->bind_param("sssdisiibi", $codigo, $nombre, $descripcion, $precio, $stock, $estado, $idCategoria, $stock_minimo, $imagenData, $idProveedor);
-        // Para blobs grandes, usar send_long_data
+        // Si hay imagen, usar 'b' (blob), si no, usar 's' (null string)
         if ($imagenData !== null) {
+            $stmt->bind_param("sssdisiibi", $codigo, $nombre, $descripcion, $precio, $stock, $estado, $idCategoria, $stock_minimo, $imagenData, $idProveedor);
             $stmt->send_long_data(8, $imagenData);
+        } else {
+            // Cambia el tipo de dato de la imagen a 's' y pasa a null
+            $stmt->bind_param("sssdisiisi", $codigo, $nombre, $descripcion, $precio, $stock, $estado, $idCategoria, $stock_minimo, $imagenData, $idProveedor);
         }
-        return $stmt->execute();
+        if (!$stmt->execute()) {
+            error_log('Error en agregarProducto: ' . $stmt->error);
+            throw new Exception('Error al agregar producto: ' . $stmt->error);
+        }
+        return true;
     }
 
     public function obtenerProductos() {

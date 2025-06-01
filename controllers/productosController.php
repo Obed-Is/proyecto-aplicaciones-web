@@ -1,8 +1,112 @@
 <?php
+require_once '../vendor/autoload.php';
 require_once '../models/db.php';
 require_once '../models/productosModel.php';
 
+// Importaciones explícitas de PhpSpreadsheet
+use PhpOffice\PhpSpreadsheet\Spreadsheet;
+use PhpOffice\PhpSpreadsheet\Writer\Xlsx;
+use PhpOffice\PhpSpreadsheet\IOFactory;
+
 $productosModel = new ProductosModel();
+
+// Importar productos desde Excel
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['importar']) && $_POST['importar'] === 'excel') {
+    if (ob_get_length()) ob_end_clean();
+    header('Content-Type: application/json');
+    set_exception_handler(function($e) {
+        error_log('Excepción no capturada: ' . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Error fatal: ' . $e->getMessage()]);
+        exit();
+    });
+    set_error_handler(function($errno, $errstr, $errfile, $errline) {
+        error_log("Error PHP [$errno] $errstr en $errfile:$errline");
+        echo json_encode(['success' => false, 'message' => "Error PHP: $errstr"]);
+        exit();
+    });
+
+    if (!isset($_FILES['archivo']) || $_FILES['archivo']['error'] !== UPLOAD_ERR_OK) {
+        error_log('Archivo no recibido o error al subir: ' . print_r($_FILES, true));
+        echo json_encode(['success' => false, 'message' => 'Archivo no recibido o error al subir.']);
+        exit();
+    }
+    $archivo = $_FILES['archivo']['tmp_name'];
+    try {
+        $spreadsheet = IOFactory::load($archivo);
+        $sheet = $spreadsheet->getActiveSheet();
+        $rows = $sheet->toArray();
+        $importados = 0;
+        $duplicados = 0;
+        $errores = [];
+        for ($i = 1; $i < count($rows); $i++) {
+            $fila = $rows[$i];
+            $codigo = trim($fila[0] ?? '');
+            $nombre = trim($fila[1] ?? '');
+            $descripcion = trim($fila[2] ?? '');
+            $precio = floatval($fila[3] ?? 0);
+            $stock = intval($fila[4] ?? 0);
+            $estado = intval($fila[5] ?? 1);
+            $idCategoria = intval($fila[6] ?? 0);
+            $idProveedor = intval($fila[7] ?? 0);
+            $stock_minimo = intval($fila[8] ?? 0);
+
+            // Validación mínima para evitar errores
+            if (!$codigo || !$nombre || !$descripcion || $precio <= 0 || $stock < 0 || $idCategoria <= 0 || $idProveedor <= 0) {
+                $errores[] = "Fila $i: Datos insuficientes o inválidos.";
+                continue;
+            }
+            if ($productosModel->codigoExiste($codigo)) {
+                $duplicados++;
+                continue;
+            }
+            try {
+                $ok = $productosModel->agregarProducto($codigo, $nombre, $descripcion, $precio, $stock, $estado, $idCategoria, $stock_minimo, null, $idProveedor);
+                if ($ok) {
+                    $importados++;
+                } else {
+                    $errores[] = "Fila $i: No se pudo agregar el producto.";
+                }
+            } catch (Exception $e) {
+                $errores[] = "Fila $i: " . $e->getMessage();
+                error_log('Error al importar producto en fila ' . $i . ': ' . $e->getMessage());
+            }
+        }
+        $msg = "Importación completada. $importados productos agregados.";
+        if ($duplicados > 0) $msg .= " $duplicados productos ya existían y no se agregaron.";
+        if (!empty($errores)) $msg .= " Errores: " . implode(' | ', $errores);
+        echo json_encode(['success' => $importados > 0, 'message' => $msg, 'errores' => $errores]);
+    } catch (Exception $e) {
+        error_log('Error al procesar el archivo: ' . $e->getMessage());
+        echo json_encode(['success' => false, 'message' => 'Error al procesar el archivo: ' . $e->getMessage()]);
+    }
+    exit();
+}
+
+// Exportar productos a Excel
+if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['exportar']) && $_POST['exportar'] === 'excel') {
+    // Limpiar cualquier salida previa
+    if (ob_get_length()) ob_end_clean();
+    $productos = $productosModel->obtenerProductos();
+    $spreadsheet = new Spreadsheet();
+    $sheet = $spreadsheet->getActiveSheet();
+    $sheet->setTitle('Productos');
+    $sheet->fromArray([
+        ['Código', 'Nombre', 'Descripción', 'Precio', 'Stock', 'Estado', 'Categoría', 'Proveedor', 'Stock Mínimo']
+    ], null, 'A1');
+    $row = 2;
+    foreach ($productos as $p) {
+        $sheet->fromArray([
+            $p['codigo'], $p['nombre'], $p['descripcion'], $p['precio'], $p['stock'],
+            $p['estado'], $p['idCategoria'], $p['idProveedor'], $p['stock_minimo']
+        ], null, 'A' . $row++);
+    }
+    header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+    header('Content-Disposition: attachment;filename="productos.xlsx"');
+    header('Cache-Control: max-age=0');
+    $writer = new Xlsx($spreadsheet);
+    $writer->save('php://output');
+    exit();
+}
 
 // POST: búsqueda, edición o agregado
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
@@ -190,6 +294,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         }
         exit();
     }
+
+    // Obtener productos para cualquier usuario autenticado
     $productos = $productosModel->obtenerProductos();
     $productos_normalizados = [];
     foreach ($productos as $p) {
