@@ -7,8 +7,23 @@ session_start();
 
 date_default_timezone_set('America/El_Salvador');
 
+$fechaInicio = $_POST['fechaInicio'] ?? '';
+$fechaFin = $_POST['fechaFin'] ?? '';
+
 $cortesModel = new CortesCajaModel();
 $cortes = $cortesModel->obtenerCortesCaja();
+
+// Filtro por fecha si se reciben parámetros
+if ($fechaInicio || $fechaFin) {
+    $cortes = array_filter($cortes, function($corte) use ($fechaInicio, $fechaFin) {
+        $fecha = $corte['fecha'];
+        $ok = true;
+        if ($fechaInicio) $ok = $ok && ($fecha >= $fechaInicio);
+        if ($fechaFin) $ok = $ok && ($fecha <= $fechaFin);
+        return $ok;
+    });
+    $cortes = array_values($cortes);
+}
 
 $pdf = new TCPDF('L', 'mm', 'A4', true, 'UTF-8', false);
 $pdf->SetCreator('Oro Verde');

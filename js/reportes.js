@@ -73,14 +73,15 @@ document.getElementById('logout-btn').addEventListener('click', () => {
         // Filtro por cliente y fechas
         function filtrarVentas() {
             const clienteTexto = inputCliente.value.trim().toLowerCase();
-            const inicio = fechaInicio.value ? new Date(fechaInicio.value) : null;
-            const fin = fechaFin.value ? new Date(fechaFin.value) : null;
+            const inicio = fechaInicio.value ? fechaInicio.value : null; // formato 'YYYY-MM-DD'
+            const fin = fechaFin.value ? fechaFin.value : null; // formato 'YYYY-MM-DD'
 
             ventasFiltradas = ventas.filter(v => {
                 const cumpleCliente = v.cliente.toLowerCase().includes(clienteTexto);
-                const fechaVenta = v.fecha ? new Date(v.fecha) : null;
-                const cumpleFechaInicio = inicio ? (fechaVenta && fechaVenta >= inicio) : true;
-                const cumpleFechaFin = fin ? (fechaVenta && fechaVenta <= fin) : true;
+                // Extraer solo la fecha en formato 'YYYY-MM-DD'
+                const fechaVenta = v.fecha ? v.fecha.substring(0, 10) : '';
+                const cumpleFechaInicio = inicio ? (fechaVenta >= inicio) : true;
+                const cumpleFechaFin = fin ? (fechaVenta <= fin) : true;
                 return cumpleCliente && cumpleFechaInicio && cumpleFechaFin;
             });
             renderTabla(ventasFiltradas);

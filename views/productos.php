@@ -21,6 +21,9 @@ if (!isset($_SESSION['usuario'])) {
     <link href="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.css" rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.4.10/dist/sweetalert2.min.js"></script>
     <link rel="stylesheet" href="../css/productos.css">
+    <script>
+        var esAdmin = <?php echo (isset($_SESSION['rol']) && $_SESSION['rol'] == 'administrador') ? 'true' : 'false'; ?>;
+    </script>
     <script src="../js/productos.js" defer></script>
 </head>
 <body>
@@ -28,7 +31,22 @@ if (!isset($_SESSION['usuario'])) {
 
     <div class="container py-5 mt-5">
         <h2 class="text-center dashboard-title mb-4 px-2">Gestión de Productos</h2>
+        <?php if ($_SESSION['rol'] == 'administrador'): ?>
         <div class="card p-4 shadow-sm mb-4">
+            <div class="mb-3 d-flex gap-2">
+                <div class="d-flex align-items-center gap-3 flex-wrap w-100">
+                    <span class="fw-semibold fs-5 text-success"><i class="bi bi-download me-1"></i> Exportar Productos</span>
+                    <button id="btnExportarProductosExcel" class="btn btn-outline-success d-flex align-items-center">
+                        <i class="bi bi-file-earmark-spreadsheet me-1"></i> Excel
+                    </button>
+                    <form id="formImportarProductos" enctype="multipart/form-data" class="d-inline-block ms-3">
+                        <label for="inputImportarProductos" class="btn btn-outline-primary d-flex align-items-center mb-0">
+                            <i class="bi bi-upload me-1"></i> Importar Excel
+                        </label>
+                        <input type="file" id="inputImportarProductos" name="archivo" accept=".xlsx,.xls" style="display:none;">
+                    </form>
+                </div>
+            </div>
             <form id="formAgregarProducto" enctype="multipart/form-data" class="row g-3">
                 <div class="col-md-2">
                     <label for="codigo" class="form-label">Código:</label>
@@ -88,6 +106,7 @@ if (!isset($_SESSION['usuario'])) {
                 </div>
             </form>
         </div>
+        <?php endif; ?>
         <!-- Buscador de productos -->
         <div class="row mb-3 align-items-center">
             <div class="d-flex col-md-6">
@@ -112,7 +131,9 @@ if (!isset($_SESSION['usuario'])) {
                             <th class="text-truncate">Proveedor</th>
                             <th class="text-truncate">Stock Mínimo</th>
                             <th class="text-truncate">Imagen</th>
+                            <?php if ($_SESSION['rol'] == 'administrador'): ?>
                             <th class="text-truncate">Acciones</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody id="tablaProductos">

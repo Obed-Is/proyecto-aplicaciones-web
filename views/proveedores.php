@@ -5,6 +5,7 @@ if (!isset($_SESSION['usuario'])) {
     header('Location: login.php');
     exit();
 }
+$esAdmin = ($_SESSION['rol'] == 'administrador');
 ?>
 <!DOCTYPE html>
 <html lang="es">
@@ -25,12 +26,24 @@ if (!isset($_SESSION['usuario'])) {
     <script defer src="../js/proveedores.js"></script>
 </head>
 
-<body>
+<body <?php if ($esAdmin) echo 'data-admin="1"'; ?>>
     <?php include 'includes/navbar.php' ?>
 
     <div class="container py-5 mt-5">
         <h2 class="text-center dashboard-title mb-4 px-2">Gestión de Proveedores</h2>
+        <?php if ($esAdmin): ?>
         <div class="card p-4 shadow-sm mb-4">
+            <div class="mb-3 d-flex gap-2">
+                <div class="d-flex align-items-center gap-3 flex-wrap w-100">
+                    <span class="fw-semibold fs-5 text-success"><i class="bi bi-download me-1"></i> Exportar Proveedor</span>
+                    <button id="btnExportarProveedoresPDF" class="btn btn-outline-danger d-flex align-items-center">
+                        <i class="bi bi-file-earmark-pdf me-1"></i> PDF
+                    </button>
+                    <button id="btnExportarProveedoresExcel" class="btn btn-outline-success d-flex align-items-center">
+                        <i class="bi bi-file-earmark-spreadsheet me-1"></i> Excel
+                    </button>
+                </div>
+            </div>
             <form id="formAgregarProveedor" class="row g-3">
                 <div class="col-md-4">
                     <label for="nombre" class="form-label">Nombre:</label>
@@ -55,6 +68,7 @@ if (!isset($_SESSION['usuario'])) {
                 </div>
             </form>
         </div>
+        <?php endif; ?>
         <div class="row mb-3 align-items-center">
             <div class="d-flex col-md-6">
                 <div class="input-group">
@@ -68,12 +82,14 @@ if (!isset($_SESSION['usuario'])) {
                 <table class="table table-hover align-middle mb-0">
                     <thead class="table-light">
                         <tr>
-                            <th class="text-truncate">ID</th>
+                            <th class="text-truncate">#</th>
                             <th class="text-truncate">Nombre</th>
                             <th class="text-truncate">Teléfono</th>
                             <th class="text-truncate">Correo</th>
                             <th class="text-truncate">Dirección</th>
+                            <?php if ($esAdmin): ?>
                             <th class="text-truncate">Acciones</th>
+                            <?php endif; ?>
                         </tr>
                     </thead>
                     <tbody id="tablaProveedores">
@@ -88,6 +104,7 @@ if (!isset($_SESSION['usuario'])) {
     </div>
 
     <!-- Modal de edición -->
+    <?php if ($esAdmin): ?>
     <div id="modalEditarProveedor" class="modal" tabindex="-1" style="display:none;">
         <div class="modal-dialog">
             <div class="modal-content">
@@ -122,5 +139,6 @@ if (!isset($_SESSION['usuario'])) {
             </div>
         </div>
     </div>
+    <?php endif; ?>
 </body>
 </html>

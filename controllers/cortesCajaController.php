@@ -64,7 +64,21 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
         echo json_encode($corte);
         exit();
     }
+    // --- FILTRO POR FECHA ---
+    $fechaInicio = $_GET['fechaInicio'] ?? '';
+    $fechaFin = $_GET['fechaFin'] ?? '';
     $cortes = $model->obtenerCortes($usuario_id, $esAdmin);
+
+    if ($fechaInicio || $fechaFin) {
+        $cortes = array_filter($cortes, function($corte) use ($fechaInicio, $fechaFin) {
+            $fecha = $corte['fecha'];
+            $ok = true;
+            if ($fechaInicio) $ok = $ok && ($fecha >= $fechaInicio);
+            if ($fechaFin) $ok = $ok && ($fecha <= $fechaFin);
+            return $ok;
+        });
+        $cortes = array_values($cortes);
+    }
     header('Content-Type: application/json');
     echo json_encode($cortes);
     exit();

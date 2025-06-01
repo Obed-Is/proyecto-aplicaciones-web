@@ -23,6 +23,7 @@ document.getElementById('logout-btn').addEventListener('click', () => {
 // ------------------------------------------------------------------- //
 
 let proveedoresData = [];
+const esAdmin = document.body.getAttribute('data-admin') === '1';
 
 document.addEventListener('DOMContentLoaded', () => {
     mostrarProveedores();
@@ -56,19 +57,29 @@ async function mostrarProveedores() {
     proveedoresData.forEach((proveedor, index) => {
         const tr = document.createElement('tr');
         tr.innerHTML = `
-            <td>${proveedor.id}</td>
+            <td>${index + 1}</td>
             <td>${proveedor.nombre}</td>
             <td>${proveedor.telefono}</td>
             <td>${proveedor.correo}</td>
             <td>${proveedor.direccion}</td>
+            ${esAdmin ? `
             <td>
                 <button class="btn btn-sm btn-primary editar-btn" data-id="${proveedor.id}"><i class="bi bi-pencil-square"></i></button>
                 <button class="btn btn-sm btn-danger eliminar-btn" data-id="${proveedor.id}"><i class="bi bi-trash"></i></button>
             </td>
+            ` : ''}
         `;
         tabla.appendChild(tr);
     });
-    asociarEventos();
+    if (esAdmin) asociarEventos();
+
+    // Botones de exportar PDF/Excel (solo si es admin)
+    if (esAdmin) {
+        const btnPDF = document.getElementById('btnExportarProveedoresPDF');
+        const btnExcel = document.getElementById('btnExportarProveedoresExcel');
+        if (btnPDF) btnPDF.onclick = function () { exportarProveedores('pdf'); };
+        if (btnExcel) btnExcel.onclick = function () { exportarProveedores('excel'); };
+    }
 }
 
 function mensajeError(mensaje) {
@@ -212,10 +223,10 @@ function proveedoresFiltro() {
             return;
         }
         document.getElementById('mensajeSinProveedores').style.display = 'none';
-        data.forEach(proveedor => {
+        data.forEach((proveedor, index) => {
             const tr = document.createElement('tr');
             tr.innerHTML = `
-                <td>${proveedor.id}</td>
+                <td>${index + 1}</td>
                 <td>${proveedor.nombre}</td>
                 <td>${proveedor.telefono}</td>
                 <td>${proveedor.correo}</td>
@@ -231,6 +242,23 @@ function proveedoresFiltro() {
         asociarEventos();
     })
     .catch(() => mensajeError('Error al buscar proveedores'));
+}
+
+function exportarProveedores(tipo) {
+    const form = document.createElement('form');
+    form.method = 'POST';
+    form.action = '../controllers/proveedoresController.php';
+    form.target = '_blank';
+
+    const inputExportar = document.createElement('input');
+    inputExportar.type = 'hidden';
+    inputExportar.name = 'exportar';
+    inputExportar.value = tipo;
+    form.appendChild(inputExportar);
+
+    document.body.appendChild(form);
+    form.submit();
+    document.body.removeChild(form);
 }
 
 function alertaEsquinaSuperior(icono, mensaje) {

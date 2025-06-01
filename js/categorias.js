@@ -143,6 +143,8 @@ async function obtenerCategorias() {
     }
 }
 
+const esAdmin = document.body.getAttribute('data-admin') === '1';
+
 function mostrarCategorias(categoriasData) {
     const tablaCategorias = document.querySelector('#tablaCategorias tbody');
     const mensajeSinCategoria = document.getElementById('mensajeSinCategoria');
@@ -162,6 +164,7 @@ function mostrarCategorias(categoriasData) {
                 <td>${indice + 1}</td>
                 <td class="text-truncate" style="max-width: 200px; overflow: hidden;">${categoria.nombre_categoria}</td>
                 <td class="text-truncate" style="max-width: 200px; overflow: hidden;">${categoria.descripcion_categoria}</td>
+                ${esAdmin ? `
                 <td class="text-center action-buttons">
                     <button class="btn btn-light" onclick="return editarCategoria(${categoria.id_categoria})">
                         <i class="bi bi-pencil-fill text-warning"></i>
@@ -170,6 +173,7 @@ function mostrarCategorias(categoriasData) {
                         <i class="bi bi-trash-fill text-danger"></i>
                     </button>
                 </td>
+                ` : ''}
             `;
 
 
