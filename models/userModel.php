@@ -345,8 +345,8 @@ class UserModel
 
         if (array_key_exists('telefono', $data)) {
             if ($this->evitarTelefonoDuplicado($data['telefono']) > 0) {
-            return 'duplicado_telefono';
-        }
+                return 'duplicado_telefono';
+            }
             $campo[] = "usuarios_detalles.telefono = ?";
             $tipoCampo .= "s";
             $valorCampo[] = trim($data['telefono']);
@@ -460,20 +460,22 @@ class UserModel
     }
 
 
-    public function inicioSesion() {
+    public function inicioSesion()
+    {
         $query = "INSERT INTO sesiones_usuario (usuario_id, fecha_entrada) VALUES (?, ?)";
         $fecha_entrada = $_SESSION['fecha_entrada'];
         $idUsuario = $_SESSION['idUsuario'];
         $stmt = $this->db->getConnection()->prepare($query);
         $stmt->bind_param('is', $idUsuario, $fecha_entrada);
 
-        if($stmt->execute()){
+        if ($stmt->execute()) {
             return true;
         }
         return false;
     }
 
-    public function salidaSesion() {
+    public function salidaSesion()
+    {
         $query = "UPDATE sesiones_usuario SET fecha_salida = ? WHERE usuario_id = ? AND fecha_salida
                 IS NULL ORDER BY id DESC LIMIT 1";
 
@@ -484,27 +486,46 @@ class UserModel
         $stmt = $this->db->getConnection()->prepare($query);
         $stmt->bind_param('si', $fecha_salida, $idUsuario);
 
-        if($stmt->execute()){
+        if ($stmt->execute()) {
             return true;
         }
         return false;
     }
 
-    public function consultarSesiones($idUsuario) {
-    $query = "SELECT fecha_entrada AS entrada, fecha_salida AS salida FROM sesiones_usuario WHERE usuario_id = ?";
+    public function consultarSesiones($idUsuario)
+    {
+        $query = "SELECT fecha_entrada AS entrada, fecha_salida AS salida FROM sesiones_usuario WHERE usuario_id = ?";
 
-    $stmt = $this->db->getConnection()->prepare($query);
-    $stmt->bind_param('i', $idUsuario);
-    $stmt->execute();
-    $result = $stmt->get_result();
+        $stmt = $this->db->getConnection()->prepare($query);
+        $stmt->bind_param('i', $idUsuario);
+        $stmt->execute();
+        $result = $stmt->get_result();
 
-    $sesiones = [];
-    while ($fila = $result->fetch_assoc()) {
-        $sesiones[] = $fila;
+        $sesiones = [];
+        while ($fila = $result->fetch_assoc()) {
+            $sesiones[] = $fila;
+        }
+
+        return $sesiones;
     }
 
-    return $sesiones;
-}
+    public function consultarVentasUsuario($idUsuario)
+    {
+        $query = "SELECT monto_total, fecha, monto_cliente, monto_devuelto, cliente, correo_cliente 
+                from ventas WHERE idUsuario = ?;";
+
+        $stmt = $this->db->getConnection()->prepare($query);
+        $stmt->bind_param('i', $idUsuario);
+        $stmt->execute();
+        $result = $stmt->get_result();
+
+        $ventasUsuario = [];
+        while ($fila = $result->fetch_assoc()) {
+            $ventasUsuario[] = $fila;
+        }
+
+        return $ventasUsuario;
+    }
 
 
 }

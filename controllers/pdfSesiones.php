@@ -4,6 +4,7 @@ require_once '../models/userModel.php';
 require_once(__DIR__ . '/../vendor/tecnickcom/tcpdf/tcpdf.php');
 
 if ($_SERVER['REQUEST_METHOD'] === 'GET') {
+    date_default_timezone_set('America/El_Salvador');
     $idUsuario = $_GET['id'] ?? null;
     $usuario_nombre = $_GET['nombre'] ?? 'Sin nombre';
     $usuario_correo = $_GET['correo'] ?? '-';
@@ -24,12 +25,12 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $pdf->SetTitle('Informe de Sesiones de Usuario - ' . $usuario_nombre);
     $pdf->SetSubject('Informe de Actividad de Usuario');
 
-    // Márgenes
+    // Margenes
     $pdf->SetMargins(PDF_MARGIN_LEFT, PDF_MARGIN_TOP, PDF_MARGIN_RIGHT);
     $pdf->SetHeaderMargin(PDF_MARGIN_HEADER);
     $pdf->SetFooterMargin(PDF_MARGIN_FOOTER);
 
-    // Saltos de página automáticos
+    // Saltos de pagina automaticos
     $pdf->SetAutoPageBreak(TRUE, PDF_MARGIN_BOTTOM);
 
     // Modo de imagen
@@ -38,36 +39,33 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     // Fuente por defecto
     $pdf->SetFont('helvetica', '', 10);
 
-    // Añadir una página
+    // Añadir una pagina
     $pdf->AddPage();
 
-    // --- CABECERA PERSONALIZADA ---
-    // Puedes definir tu propia cabecera si necesitas más control
-    // Eliminar cabecera por defecto para usar una personalizada
     $pdf->setPrintHeader(false);
     $pdf->setPrintFooter(false);
 
     // Contenido de la cabecera
     $pdf->SetFont('helvetica', 'B', 20);
-    $pdf->SetTextColor(40, 40, 40); // Gris oscuro
+    $pdf->SetTextColor(40, 40, 40);
     $pdf->Cell(0, 15, 'INFORME DE SESIONES DE USUARIO', 0, 1, 'C', 0, '', 0, false, 'T', 'M');
     $pdf->SetFont('helvetica', '', 10);
-    $pdf->SetTextColor(90, 90, 90); // Gris más claro
+    $pdf->SetTextColor(90, 90, 90);
     $pdf->Cell(0, 5, 'Empresa: Oro Verde', 0, 1, 'R');
     $pdf->Cell(0, 5, 'Fecha de informe: ' . date('d/m/Y H:i:s'), 0, 1, 'R');
     $pdf->Ln(5);
-    $pdf->SetDrawColor(190, 190, 190); // Línea divisoria gris
+    $pdf->SetDrawColor(190, 190, 190); 
     $pdf->Line(10, $pdf->getY(), $pdf->getPageWidth() - 10, $pdf->getY());
-    $pdf->Ln(10); // Espacio después de la línea
-    // --- FIN CABECERA PERSONALIZADA ---
+    $pdf->Ln(10); 
+    // --- FIN CABECERA  ---
 
-    // Información del usuario
+    // Informacion del usuario
     $pdf->SetFont('helvetica', 'B', 13);
-    $pdf->SetTextColor(40, 40, 40); // Gris oscuro para un look más elegante
-    $pdf->Cell(0, 8, 'Información del Usuario', 0, 1, 'L');
+    $pdf->SetTextColor(40, 40, 40);
+    $pdf->Cell(0, 8, 'Informacion del Usuario', 0, 1, 'L');
 
     $pdf->SetFont('helvetica', '', 11);
-    $pdf->SetTextColor(60, 60, 60); // Texto normal ligeramente más claro
+    $pdf->SetTextColor(60, 60, 60);
 
     $pdf->Cell(40, 8, 'Nombre:', 0, 0, 'L');
     $pdf->SetFont('helvetica', 'B', 11);
@@ -78,21 +76,19 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
     $pdf->SetFont('helvetica', 'B', 11);
     $pdf->Cell(0, 8, $usuario_correo, 0, 1, 'L');
 
-    $pdf->Ln(5); // Espacio antes del siguiente bloque
+    $pdf->Ln(5);
 
 
-    // Resumen de sesiones (Opcional, pero añade valor)
     $totalSesiones = count($sesionesData);
     $pdf->SetFont('helvetica', 'I', 10);
     $pdf->Cell(0, 7, 'Total de sesiones registradas: ' . $totalSesiones, 0, 1, 'L');
     $pdf->Ln(8);
 
     // --- TABLA DE SESIONES ---
-    $pdf->SetFillColor(230, 240, 255); // Azul claro para el encabezado
-    $pdf->SetTextColor(0, 0, 0); // Texto negro
+    $pdf->SetFillColor(230, 240, 255);
+    $pdf->SetTextColor(0, 0, 0); 
     $pdf->SetFont('helvetica', 'B', 11);
 
-    // Anchos de columna (ajusta según necesidad)
     $w = array(60, 60, 50);
 
     // Encabezados de la tabla
@@ -114,7 +110,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $e = new DateTime($row['entrada']);
             $s = new DateTime($row['salida']);
             $interval = $e->diff($s);
-            $duracion = $interval->format('%h horas %i minutos %s s'); // Más detalle en la duracion
+            $duracion = $interval->format('%h horas %i minutos %s s');
         } else if ($row['entrada'] && !$row['salida']) {
             $e = new DateTime($row['entrada']);
             $now = new DateTime();
@@ -124,17 +120,16 @@ if ($_SERVER['REQUEST_METHOD'] === 'GET') {
             $duracion = 'N/A';
         }
 
-        // Alternar color de fila para mejor legibilidad
-        $fill = ($rowCounter % 2 == 0) ? 0 : 1; // 0 para sin relleno (blanco), 1 para relleno
+        $fill = ($rowCounter % 2 == 0) ? 0 : 1; 
         if ($fill) {
-            $pdf->SetFillColor(245, 245, 245); // Gris muy claro
+            $pdf->SetFillColor(245, 245, 245); 
         } else {
             $pdf->SetFillColor(255, 255, 255);
         }
 
-        $pdf->Cell($w[0], 8, $entrada, 'LR', 0, 'L', $fill); // Borde Left/Right
+        $pdf->Cell($w[0], 8, $entrada, 'LR', 0, 'L', $fill);
         $pdf->Cell($w[1], 8, $salida, 'LR', 0, 'L', $fill);
-        $pdf->Cell($w[2], 8, $duracion, 'LR', 1, 'L', $fill); // Borde Right, nueva línea
+        $pdf->Cell($w[2], 8, $duracion, 'LR', 1, 'L', $fill); 
         $rowCounter++;
     }
 

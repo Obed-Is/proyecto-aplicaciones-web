@@ -156,9 +156,9 @@ function cerrarCajaPHP() {
         cancelButtonColor: '#3085d6'
     }).then((result) => {
         if (result.isConfirmed) {
-            corteCaja(true); 
+            corteCaja('cerrar'); 
         } else if (result.isDenied) {
-            corteCaja(); 
+            corteCaja('parcial'); 
         }
     });
 
@@ -173,7 +173,11 @@ function cerrarCajaPHP() {
         }).then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    actualizarCajaCerrada();
+                    if(tipoCorte === 'cerrar'){
+                        actualizarCajaCerrada();
+                    }else{
+                       estadoDeCaja.textContent = 'Caja cerrada temporalmente';
+                    }
                     alertaEsquinaSuperior('success', 'Corte de caja', data.message);
                     console.log('data del fetch de cerrar corte de caja: ', data);
                     return true;

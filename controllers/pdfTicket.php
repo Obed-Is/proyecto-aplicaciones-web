@@ -5,10 +5,11 @@ require_once __DIR__ . '/../vendor/tecnickcom/tcpdf/tcpdf.php';
 if (!isset($_SESSION['ticket'])) {
     die("No hay datos para mostrar el ticket.");
 }
+date_default_timezone_set('America/El_Salvador');
 
 $data = $_SESSION['ticket'];
 $productos = $_SESSION['productos'];
-$fechaFormateada = date('d/m/Y H:i', strtotime($data['fechaVenta']));
+$fechaFormateada = date('d/m/Y H:i');
 
 $totalVenta = number_format($data['totalVenta'], 2, '.', ',');
 $pagoCliente = number_format($data['pagoCliente'], 2, '.', ',');

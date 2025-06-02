@@ -23,6 +23,7 @@ if ($rolUsuario !== 'administrador') {
         ?>
         <!DOCTYPE html>
         <html lang="es">
+
         <head>
             <meta charset="UTF-8">
             <title>Corte de caja requerido</title>
@@ -31,12 +32,14 @@ if ($rolUsuario !== 'administrador') {
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.min.css">
             <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
             <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+            <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.all.min.js"></script>
             <style>
                 body {
                     background: linear-gradient(135deg, #f1f1f1, #cfe8ff);
                 }
             </style>
         </head>
+
         <body class="bg-light">
             <?php include "includes/navbar.php" ?>
             <div class="container py-5 mt-5 d-flex justify-content-center">
@@ -66,20 +69,44 @@ if ($rolUsuario !== 'administrador') {
 
                 document.getElementById('logout-btn').addEventListener('click', () => {
                     Swal.fire({
-                        title: '¿Estás seguro?',
+                        title: '¿Estas seguro?',
                         text: '¿Quieres cerrar sesion?',
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonText: 'Si, cerrar sesion',
+                        confirmButtonText: 'Sí, cerrar sesion',
                         cancelButtonText: 'Cancelar'
                     }).then((result) => {
                         if (result.isConfirmed) {
-                            window.location.href = '../controllers/logout.php';
+                            fetch('../controllers/logout.php', { method: 'POST' })
+                                .then(res => {
+                                    if (!res.ok) throw new Error('Error en la respuesta del servidor');
+                                    return res.json();
+                                })
+                                .then(data => {
+                                    if (data.success) {
+                                        window.location.href = '../views/login.php';
+                                    } else {
+                                        Swal.fire({
+                                            icon: 'warning',
+                                            title: 'Atencion',
+                                            text: data.message,
+                                        });
+                                    }
+                                })
+                                .catch(error => {
+                                    console.error('Error en fetch logout:', error);
+                                    Swal.fire({
+                                        icon: 'error',
+                                        title: 'Error',
+                                        text: 'Ocurrio un problema al cerrar sesion',
+                                    });
+                                });
                         }
-                    })
-                })
+                    });
+                });
             </script>
         </body>
+
         </html>
         <?php
         exit();
@@ -92,11 +119,13 @@ if ($rolUsuario !== 'administrador') {
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Dashboard de Ventas | MyStore Pro</title>
+    <title>Panel de ventas - Oro Verde</title>
     <link rel="shortcut icon" href="../logo.webp" type="image/x-icon" />
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.all.min.js"></script>
     <link rel="stylesheet" href="../css/ventas.css" />
     <script defer src="../js/ventas.js"></script>
 </head>
@@ -221,8 +250,7 @@ if ($rolUsuario !== 'administrador') {
         </div>
     </div>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11.10.8/dist/sweetalert2.all.min.js"></script>
+
 </body>
 
 </html>
