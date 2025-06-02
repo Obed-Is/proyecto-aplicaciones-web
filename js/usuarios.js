@@ -202,7 +202,9 @@ function cargarDataDetalles(idUsuario) {
                                 </button>
                                 
                                 
-                                <button type="button" class="btn btn-outline-danger" title="Eliminar usuario">
+                                <button 
+                                onclick="window.open('../controllers/pdfVentasUsuario.php?id=${usuarioEncontrado.usuario_id}&nombre=${usuarioEncontrado.usuario_nombre} ${usuarioEncontrado.usuario_apellido}&correo=${usuarioEncontrado.correo_electronico}')"
+                                type="button" class="btn btn-outline-danger" title="Eliminar usuario">
                                     <i class="bi bi-file-earmark-pdf"></i> Ventas del usuario
                                 </button>
 
